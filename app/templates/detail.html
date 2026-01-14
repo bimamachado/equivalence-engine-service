@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Detalhe</title></head>
+<body>
+  <h2>Detalhe</h2>
+  <p><b>Request:</b> {{ r.request_id }}</p>
+  <p><b>Decisão:</b> {{ r.decision }} | <b>Score:</b> {{ r.score }} | <b>Degradado:</b> {{ r.degraded_mode }}</p>
+  <p><b>Versões:</b> policy={{ r.policy_version }} | taxonomy={{ r.taxonomy_version }} | model={{ r.model_version }}</p>
+
+  <h3>Label Humana (calibração)</h3>
+  {% if label %}
+    <p><b>Última:</b> {{ label.label }} (por {{ label.labeled_by }} em {{ label.created_at }})</p>
+    <pre>{{ label.notes }}</pre>
+  {% else %}
+    <p><i>Sem label ainda.</i></p>
+  {% endif %}
+
+  <form method="post" action="/dashboard/result/{{ r.id }}/label">
+    <input name="labeled_by" placeholder="seu nome" required />
+    <select name="label" required>
+      <option value="DEFERIDO">DEFERIDO</option>
+      <option value="COMPLEMENTO">COMPLEMENTO</option>
+      <option value="INDEFERIDO">INDEFERIDO</option>
+    </select>
+    <input name="notes" placeholder="observações (opcional)" />
+    <button type="submit">Salvar label</button>
+  </form>
+
+  <h3>Origem</h3>
+  <p>{{ r.origem_nome }} ({{ r.origem_carga }}h)</p>
+
+  <h3>Destino</h3>
+  <p>{{ r.destino_nome }} ({{ r.destino_carga }}h)</p>
+
+  <h3>Justificativa</h3>
+  <pre>{{ r.justificativa_detalhada }}</pre>
+
+  <h3>Breakdown</h3>
+  <pre>{{ r.breakdown }}</pre>
+
+  <h3>Faltantes</h3>
+  <pre>{{ r.missing }}</pre>
+
+  <h3>Críticos faltantes</h3>
+  <pre>{{ r.missing_critical }}</pre>
+
+  <h3>Timings</h3>
+  <pre>{{ r.timings_ms }}</pre>
+
+  <p><a href="/dashboard">voltar</a></p>
+</body>
+</html>

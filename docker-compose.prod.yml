@@ -1,0 +1,91 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: equivalence
+      POSTGRES_USER: equivalence
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+    ports:
+      - "6379:6379"
+
+  api:
+    build: .
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      API_KEY_SALT: ${API_KEY_SALT}
+      RQ_QUEUE_NAME: ${RQ_QUEUE_NAME}
+      EMBED_URL: ${EMBED_URL}
+      LLM_URL: ${LLM_URL}
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "8000:8000"
+    command: ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "-w", "2", "-b", "0.0.0.0:8000", "app.main:app"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3  
+
+  worker:
+    build: .
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      API_KEY_SALT: ${API_KEY_SALT}
+      RQ_QUEUE_NAME: ${RQ_QUEUE_NAME}
+      EMBED_URL: ${EMBED_URL}
+      LLM_URL: ${LLM_URL}
+    depends_on:
+      - postgres
+      - redis
+    command: ["rq", "worker", "-u", "${REDIS_URL}", "${RQ_QUEUE_NAME}"]
+    healthcheck:
+      test: ["CMD", "rq", "info", "-u", "${REDIS_URL}"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      
+  migrate:
+    build: .
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    depends_on:
+      - postgres
+    command: ["alembic", "upgrade", "head"]
+    restart: "no"
+  pg-backup:
+    image: prodrigestivill/postgres-backup-local
+    depends_on:
+      - postgres
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: equivalence
+      POSTGRES_USER: equivalence
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      BACKUP_DIR: /backups
+      SCHEDULE: "@daily"
+      BACKUP_KEEP_DAYS: 7
+      BACKUP_KEEP_WEEKS: 4
+      BACKUP_KEEP_MONTHS: 6
+    volumes:
+      - pgbackups:/backups
+
+
+
+volumes:
+  pgdata:
+  redisdata:
+  pgbackups:

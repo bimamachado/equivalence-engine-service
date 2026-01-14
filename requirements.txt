@@ -1,0 +1,23 @@
+
+python-dotenv
+pydantic>=2.0,<3.0
+httpx
+requests
+pytest
+typing-extensions
+# Development / CI tooling
+# See requirements-dev.txt for linters/formatters
+fastapi
+sqlalchemy>=2.0
+psycopg2-binary
+asyncpg
+alembic
+redis
+rq
+jinja2
+python-multipart
+numpy
+alembic==1.13.2
+gunicorn==22.0.0
+uvicorn==0.30.6
+psycopg2-binary==2.9.9
