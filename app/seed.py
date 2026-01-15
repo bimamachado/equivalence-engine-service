@@ -1,27 +1,14 @@
 import uuid
+
+import uuid
+import os
 from sqlalchemy.orm import Session
 from app.db import SessionLocal
 from app import models
 from app.security import hash_api_key
-import os
-api_key = os.getenv("TENANT_API_KEY", "dev-arbe-key-123")
-from app.security import hash_api_key
-import os
 
-admin_key = os.getenv("ADMIN_API_KEY", "dev-admin-123")
-auditor_key = os.getenv("AUDITOR_API_KEY", "dev-auditor-123")
-client_key = os.getenv("CLIENT_API_KEY", "dev-client-123")
 
-# Tenant
-t = models.Tenant(
-    id="arbe",
-    name="ARBE",
-    api_key_hash="legacy",  # opcional manter, não usado no RBAC
-    status="active"
-)
-db.merge(t)
-
-def upsert_key(name: str, key_plain: str, role: str):
+def upsert_key(db: Session, name: str, key_plain: str, role: str):
     kid = str(uuid.uuid4())
     db.add(models.ApiKey(
         id=kid,
@@ -32,15 +19,30 @@ def upsert_key(name: str, key_plain: str, role: str):
         status="active"
     ))
 
-upsert_key("dashboard-admin", admin_key, "admin")
-upsert_key("dashboard-auditor", auditor_key, "auditor")
-upsert_key("prod-api-client", client_key, "api-client")
 
 def run_seed():
     db: Session = SessionLocal()
     try:
+        admin_key = os.getenv("ADMIN_API_KEY", "dev-admin-123")
+        auditor_key = os.getenv("AUDITOR_API_KEY", "dev-auditor-123")
+        client_key = os.getenv("CLIENT_API_KEY", "dev-client-123")
+
         tenant_id = "arbe"
         course_id = "ADM-001"
+
+        # Tenant
+        t = models.Tenant(
+            id=tenant_id,
+            name="ARBE",
+            api_key_hash="legacy",  # opcional manter, não usado no RBAC
+            status="active"
+        )
+        db.merge(t)
+
+        # API keys
+        upsert_key(db, "dashboard-admin", admin_key, "admin")
+        upsert_key(db, "dashboard-auditor", auditor_key, "auditor")
+        upsert_key(db, "prod-api-client", client_key, "api-client")
 
         # TAXONOMY VERSION
         tv_id = str(uuid.uuid4())
@@ -127,6 +129,7 @@ def run_seed():
         print("Seed OK:", {"tenant": tenant_id, "course_id": course_id, "taxonomy_version": "2026.01", "policy_version": "v3"})
     finally:
         db.close()
+
 
 if __name__ == "__main__":
     run_seed()

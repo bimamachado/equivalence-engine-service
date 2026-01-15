@@ -1,32 +1,3 @@
-# Equivalence Engine Service
-
-Resumo rápido de como rodar o projeto localmente.
-
-Requisitos
-- Python 3.10+
-- Recomenda-se criar um virtual environment (`.venv`).
-
-[Guia completo → README.full.md](README.full.md)
-```markdown
-# Equivalence Engine Service
-
-Resumo rápido de como rodar o projeto localmente e usar a API.
-
-Requisitos
-- Python 3.10+
-- Recomenda-se criar um virtual environment (`.venv`).
-
-Configuração rápida
-
-1. Criar e ativar o virtualenv
-
-WSL / Linux / macOS:
-```bash
-python -m venv .venv
-source .venv/bin/activate
-```
-
-````markdown
 # Equivalence Engine — Guia completo (Macro → Micro)
 
 Este documento detalha a arquitetura e o uso do projeto do macro (visão geral) ao micro (endpoints, exemplos e comandos), incluindo variáveis de ambiente, como subir os serviços, como rodar workers, migrar o banco e exemplos de requisições.
@@ -132,15 +103,15 @@ Exemplo mínimo (curl):
 
 ```bash
 curl -sS -X POST http://localhost:8000/v1/equivalences/evaluate \
-    -H 'Content-Type: application/json' \
-    -H 'X-API-Key: dev-admin-abc123' \
-    -d '{
-        "request_id":"req-001",
-        "origem": {"nome":"Algoritmos","carga_horaria":60,"ementa":"...","aprovado":true,"nivel":"intermediario"},
-        "destino": {"nome":"Introdução a Programação","carga_horaria":60,"ementa":"...","nivel":"basico"},
-        "policy": {"min_score_deferir":85},
-        "taxonomy_version":"2026.01"
-    }'
+  -H 'Content-Type: application/json' \
+  -H 'X-API-Key: dev-admin-abc123' \
+  -d '{
+    "request_id":"req-001",
+    "origem": {"nome":"Algoritmos","carga_horaria":60,"ementa":"...","aprovado":true,"nivel":"intermediario"},
+    "destino": {"nome":"Introdução a Programação","carga_horaria":60,"ementa":"...","nivel":"basico"},
+    "policy": {"min_score_deferir":85},
+    "taxonomy_version":"2026.01"
+  }'
 ```
 
 Exemplo em Python (requests):
@@ -150,11 +121,11 @@ import requests
 url='http://localhost:8000/v1/equivalences/evaluate'
 headers={'X-API-Key':'dev-admin-abc123','Content-Type':'application/json'}
 payload={
-    'request_id':'req-001',
-    'origem':{'nome':'Algoritmos','carga_horaria':60,'ementa':'...','aprovado':True,'nivel':'intermediario'},
-    'destino':{'nome':'Introdução a Programação','carga_horaria':60,'ementa':'...','nivel':'basico'},
-    'policy':{'min_score_deferir':85},
-    'taxonomy_version':'2026.01'
+  'request_id':'req-001',
+  'origem':{'nome':'Algoritmos','carga_horaria':60,'ementa':'...','aprovado':True,'nivel':'intermediario'},
+  'destino':{'nome':'Introdução a Programação','carga_horaria':60,'ementa':'...','nivel':'basico'},
+  'policy':{'min_score_deferir':85},
+  'taxonomy_version':'2026.01'
 }
 resp=requests.post(url,json=payload,headers=headers)
 print(resp.status_code, resp.json())
@@ -206,4 +177,3 @@ Próximos passos que eu posso fazer
 ---
 
 Arquivo criado: `README.full.md`. Se quiser que eu integre este conteúdo ao `README.md` principal, diga se prefere que eu substitua um bloco específico ou que eu adicione um link para `README.full.md` no topo do `README.md`.
-
