@@ -65,7 +65,7 @@ class EquivalenceEngine:
             #      taxonomy nodes that will be used by scoring functions.
             with timer_ms() as t:
                 nodes = self.taxonomy_store.get_nodes(req.taxonomy_version)
-            timings.validate = t()
+            timings.validate_ms = t()
 
             # 2) Hard rules (deterministic business rules)
             #    - fast checks that can decide the request without invoking
