@@ -26,13 +26,64 @@ Arquivos de referência (visão macro):
 
 ## Fluxo de requisição (macro → micro)
 
-1. Cliente envia requisição ao endpoint (ex.: `POST /v1/evaluate`). Veja rotas em [app/api/routes.py](app/api/routes.py) e [app/api/batch_routes.py](app/api/batch_routes.py).
-2. A rota valida payload com `pydantic` (esquemas em [app/api/schemas.py](app/api/schemas.py)).
-3. A requisição é encaminhada ao serviço de execução/engine: [app/engine/service.py](app/engine/service.py).
-4. O `service` orquestra mapeadores (`app/mapper/*`), validações (`app/engine/validator.py`) e regras (`app/engine/hard_rules.py`).
-5. Se necessário, tarefas são enfileiradas via [app/queue.py](app/queue.py) / `rq` e processadas por [app/worker.py](app/worker.py).
-6. Resultados (decisões, justificativas) são salvos/consultados via [app/db.py](app/db.py) e repositórios em [app/repos.py](app/repos.py) e [app/audit](app/audit/).
-7. Serviços auxiliares: cache ([app/cache/cache.py](app/cache/cache.py)), taxonomia ([app/taxonomy/store.py](app/taxonomy/store.py)), embeddings/index ([app/index_builder.py]).
+Abaixo cada etapa do fluxo com sua finalidade e um pequeno exemplo demonstrando o que entra/saí e por que a etapa existe.
+
+1) Recepção do pedido (HTTP)
+  - Finalidade: receber a requisição do cliente e expor o contrato (endpoint). Atua como porta de entrada do sistema.
+  - Onde: [app/api/routes.py](app/api/routes.py), [app/api/batch_routes.py](app/api/batch_routes.py)
+  - Exemplo: `POST /v1/evaluate` com payload JSON (ver seção de exemplos no documento).
+
+2) Validação / Parsing
+  - Finalidade: garantir que o payload esteja completo e no formato esperado antes de processar (falha rápida para input inválido).
+  - Onde: `pydantic` schemas em [app/api/schemas.py](app/api/schemas.py)
+  - Exemplo: `pydantic` rejeita requests sem `origem.ementa` ou com `policy` faltando campos obrigatórios.
+
+3) Orquestração pelo Engine (`service`)
+  - Finalidade: núcleo que comanda o processamento — aplica regras, solicita mapeamento, calcula scores, decide e gera justificativas.
+  - Onde: [app/engine/service.py](app/engine/service.py)
+  - Exemplo: `service.evaluate(req)` segue passos internos (hard rules → mapping → scoring → decision → justification).
+
+4) Regras determinísticas (Hard Rules)
+  - Finalidade: executar checagens rápidas e determinísticas que podem encerrar o fluxo (p.ex. regras de elegibilidade, validade de carga horária, bloqueios administrativos).
+  - Onde: [app/engine/hard_rules.py](app/engine/hard_rules.py)
+  - Exemplo: se origem e destino tiverem o mesmo código curricular, retornar indeferido sem chamar mapeadores mais custosos.
+
+5) Mapeamento (Text → Conceitos)
+  - Finalidade: transformar texto (ementa) em conceitos/tokens da taxonomia (vetores/itens com confiança). É a etapa que chama LLMs/embeddings ou mapeadores locais.
+  - Onde: `app/mapper/*` (ex.: `app/mapper/openai_mapper.py`, `app/mapper/embedding_llm_mapper.py`)
+  - Exemplo: converter a ementa em uma lista de `MappedConcept(node_id, weight, confidence, evidence)`.
+
+6) Scoring e cobertura
+  - Finalidade: comparar vetores de origem/destino, calcular cobertura geral e crítica, aplicar penalidades por níveis e consolidar em um `score` final.
+  - Onde: [app/engine/scoring.py](app/engine/scoring.py)
+  - Exemplo: `coverage(vec_o, vec_d)` retorna conceitos cobertos e faltantes; `final_score(...)` converte métricas em valor numérico.
+
+7) Decisão e justificativa
+  - Finalidade: aplicar a política (`policy`) para transformar o `score` em uma decisão (`ACEITO` / `INDEFERIDO` / `REVISAR`) e gerar justificativas legíveis para auditoria e usuário.
+  - Onde: [app/engine/decision.py](app/engine/decision.py), [app/engine/justification.py](app/engine/justification.py)
+  - Exemplo: `decide(policy, score, cov_crit)` → `("ACEITO", "score acima do limiar")`, e `build_justification(...)` cria texto curto/detalhado.
+
+8) Enfileiramento / Processamento Assíncrono
+  - Finalidade: quando for batch ou processamento pesado, enfileirar jobs para workers; permite escalabilidade e desacoplamento.
+  - Onde: [app/queue.py](app/queue.py), `rq` e [app/worker.py](app/worker.py)
+  - Exemplo: `POST /v1/batch` cria job em Redis via RQ; `worker` processa e grava resultado no DB.
+
+9) Persistência, cache e auditoria
+  - Finalidade: salvar decisões, justificativas e metas de execução; usar cache para acelerar mapeamentos e consultas; auditar requests para conformidade.
+  - Onde: [app/db.py](app/db.py), [app/repos.py](app/repos.py), [app/cache/cache.py](app/cache/cache.py), [app/audit](app/audit/)
+  - Exemplo: gravar `EvaluateResponse` em repositório e salvar hash das ementas para rastreabilidade.
+
+Exemplo completo (fluxo simplificado):
+
+1. Cliente envia `POST /v1/evaluate` com payload (ementas, policy, options).
+2. `routes.py` valida via `pydantic` e chama `service.evaluate(req)`.
+3. `service` aplica hard rules — se bloqueado, retorna `INDEFERIDO`.
+4. Caso contrário, `service` pede ao `mapper` os conceitos mapeados (cache first).
+5. `scoring` compara vetores e gera `score` e `breakdown`.
+6. `decision` aplica política e gera `decisao` + `motivo`.
+7. `justification` monta explicações; `audit` grava o resultado; resposta é retornada ao cliente.
+
+Links rápidos: ver handlers em [app/api/routes.py](app/api/routes.py) e a implementação do orchestrador em [app/engine/service.py](app/engine/service.py).
 
 ## Componentes principais (micro) — responsabilidade e onde olhar
 
