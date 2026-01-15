@@ -113,4 +113,97 @@ Arquivos exemplos:
 
 ---
 
-Se quiser, eu ajusto o documento para incluir diagramas ASCII do fluxo, snippets de código com exemplos reais de entrada/saída, ou referências específicas a linhas de arquivo. Quer que eu comente trechos de `app/engine/service.py` explicando passo-a-passo?
+## Frameworks e bibliotecas principais
+
+Lista das dependências e frameworks usados no projeto com uma breve explicação da finalidade de cada um:
+
+- **FastAPI**: framework web assíncrono usado para expor a API HTTP e definir rotas e dependências (`app/main.py`, `app/api/`).
+- **Uvicorn / Gunicorn**: servidores ASGI/WGI para executar a aplicação em produção ou desenvolvimento (`uvicorn` usado no desenvolvimento, `gunicorn` em deploy com workers).
+- **Pydantic**: validação e modelagem de dados (request/response schemas) usada em `app/api/schemas.py`.
+- **SQLAlchemy**: ORM e camada de acesso a banco de dados (modelos e sessão DB em `app/db.py`, `app/repos.py`).
+- **psycopg2-binary**: driver PostgreSQL síncrono (usado quando necessário para conexões sync).
+- **asyncpg**: driver PostgreSQL assíncrono (usado para operações async performáticas).
+- **Alembic**: ferramenta de migrações de esquema do banco; mantém versões de schema (`alembic/`).
+- **Redis**: armazenamento em memória usado como broker/cache (cache local/internacionalização, filas, rate-limiting). Veja `app/redis_client.py` e uso em `app/cache`.
+- **RQ**: fila de jobs (Redis Queue) usada para processamento assíncrono/background (`app/queue.py`, `app/worker.py`, `rq_hooks.py`).
+- **httpx / requests**: clientes HTTP para chamadas externas (integração com serviços externos, mapeadores, webhooks).
+- **numpy**: operações numéricas/arrays (usado nas rotinas de scoring e vetorização se necessário).
+- **jinja2**: template engine (templates HTML em `templates/`, usado para dashboards/relatórios).
+- **python-multipart**: suporte a multipart/form-data uploads (se endpoints aceitarem arquivos).
+- **python-dotenv**: carregamento de variáveis de ambiente a partir de `.env` em ambientes de desenvolvimento.
+- **pytest**: suíte de testes e runner (usado em `tests/`).
+
+Observações operacionais:
+- **Redis + RQ**: Redis atua como broker para `RQ` e também pode ser usado como cache; garanta que o serviço Redis esteja disponível para executar workers.
+- **Alembic**: rode `alembic upgrade head` ao implantar mudanças no schema.
+- **Drivers DB**: `asyncpg` é recomendado para endpoints/fluxos async; `psycopg2-binary` é útil para ferramentas de manutenção sync (migrations, scripts).
+
+Abaixo há um exemplo prático de `docker-compose.yml` para subir Postgres + Redis + web (Uvicorn) + worker (RQ). Ajuste conforme seu ambiente.
+
+```yaml
+version: '3.8'
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: equivalence
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  redis:
+    image: redis:7
+    ports:
+      - '6379:6379'
+
+  web:
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./:/usr/src/app:ro
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/equivalence
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - '8000:8000'
+    depends_on:
+      - db
+      - redis
+
+  worker:
+    build: .
+    command: rq worker -u redis://redis:6379/0 default
+    volumes:
+      - ./:/usr/src/app:ro
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/equivalence
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - redis
+      - db
+
+volumes:
+  postgres_data:
+```
+
+Comandos úteis:
+
+```bash
+# subir DB e Redis
+docker-compose up -d db redis
+
+# aplicar migrações Alembic (dentro do serviço web)
+docker-compose run --rm web alembic upgrade head
+
+# subir web e worker
+docker-compose up -d web worker
+```
+
+Notas:
+- Use `env_file:` para carregar variáveis sensíveis (não as commit no repo).
+- O `build: .` assume que existe um `Dockerfile` na raiz (há um `Dockerfile` neste repositório). Ajuste se preferir usar uma imagem pré-builtin.
+
+Se quiser, eu commito esta alteração e dou push para `main`.
