@@ -66,7 +66,7 @@ class EvidenceBlock(BaseModel):
     missing_critical_concepts: List[int] = Field(default_factory=list)
 
 class TimingsMs(BaseModel):
-    validate: int = 0
+    validate_ms: int = 0
     hard_rules: int = 0
     map: int = 0
     score: int = 0
