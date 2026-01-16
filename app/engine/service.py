@@ -33,7 +33,7 @@ class EquivalenceEngine:
             # 1) validação básica (Pydantic já fez, mas aqui você poderia impor regras extra)
             with timer_ms() as t:
                 nodes = self.taxonomy_store.get_nodes(req.taxonomy_version)
-            timings.validate = t()
+            timings.validation = t()
 
             # 2) hard rules
             with timer_ms() as t:
