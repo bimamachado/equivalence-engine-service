@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   web:
@@ -12,6 +11,8 @@ services:
     depends_on:
       - mock-embed
       - mock-llm
+    volumes:
+      - ./:/app
 
   mock-embed:
     build: .
@@ -49,3 +50,4 @@ services:
 
 volumes:
   pgdata:
+  

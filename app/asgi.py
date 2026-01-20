@@ -1,3 +1,4 @@
+import app.middleware_runtime_patch
 from fastapi import FastAPI
 from app.api import routes
 
