@@ -11,6 +11,7 @@ PUBLIC_PATHS = {
     "/openapi.json",
     "/redoc",
     "/metrics",
+    "/test-ui",
 }
 
 def _is_public(path: str) -> bool:
