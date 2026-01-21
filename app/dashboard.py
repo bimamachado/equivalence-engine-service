@@ -1,5 +1,6 @@
 import uuid
 from fastapi import APIRouter, Depends, Request, Form
+from app.deps import require_role
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 from fastapi.templating import Jinja2Templates

@@ -1,4 +1,4 @@
-from fastapi import Request, HTTPException
+from fastapi import Request, HTTPException, Depends
 
 def get_tenant_id(request: Request) -> str:
     tenant_id = getattr(request.state, "tenant_id", None)
