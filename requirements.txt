@@ -21,3 +21,4 @@ alembic==1.13.2
 gunicorn==22.0.0
 uvicorn==0.30.6
 psycopg2-binary==2.9.9
+rq==2.6.1

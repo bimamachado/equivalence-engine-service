@@ -117,7 +117,7 @@ def evaluate(
 
     # 3) processa
     engine = get_engine()
-    resp = engine.evaluate(req)
+    resp = engine.evaluate(req, tenant_id)
 
     # 4) salvar no DB (em teoria seu engine/worker já faz, mas endpoint síncrono precisa salvar)
     # Se você já salva no engine, ótimo. Se não, faça aqui.

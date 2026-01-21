@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.db import get_db
 from app import models
 from app.queue import queue
-from app.deps import get_tenant_id
+from app.deps import get_tenant_id, require_role
 
 router = APIRouter(prefix="/admin", dependencies=[Depends(require_role("admin"))])
 

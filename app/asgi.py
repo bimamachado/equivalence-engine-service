@@ -1,5 +1,3 @@
-from fastapi import FastAPI
-from app.api import routes
-
-app = FastAPI(title="Equivalence Engine Service")
-app.include_router(routes.router)
+import app.middleware_runtime_patch
+# Reuse the main application instance so container entrypoint exposes same routes
+from app.main import app

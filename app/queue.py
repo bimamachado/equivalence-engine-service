@@ -1,5 +1,17 @@
 from rq import Queue
-from rq.retry import Retry
+try:
+    # rq >= 1.0 exposes Retry in rq.retry
+    from rq.retry import Retry
+except Exception:
+    try:
+        # older/newer layouts may expose Retry at top-level
+        from rq import Retry
+    except Exception:
+        # Fallback minimal Retry implementation so app can run
+        class Retry:
+            def __init__(self, max=0, interval=None):
+                self.max = max
+                self.interval = interval
 from app.redis_client import redis_conn
 from app.config import settings
 

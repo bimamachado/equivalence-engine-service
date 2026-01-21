@@ -3,7 +3,9 @@ import threading
 from collections import defaultdict
 from fastapi import APIRouter
 from fastapi.responses import PlainTextResponse
-from app.metrics import render_prometheus
+
+# router definido aqui para expor a rota /metrics
+router = APIRouter()
 
 _lock = threading.Lock()
 
