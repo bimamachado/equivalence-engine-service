@@ -16,6 +16,10 @@ class ObservabilityMiddleware(BaseHTTPMiddleware):
         rid = request.headers.get("Idempotency-Key") or str(uuid.uuid4())
         request.state.request_id = rid
 
+        # trace id: accept incoming or generate a new one
+        trace_id = request.headers.get("X-Trace-Id") or str(uuid.uuid4())
+        request.state.trace_id = trace_id
+
         response = None
         status = 500
         try:
@@ -33,6 +37,7 @@ class ObservabilityMiddleware(BaseHTTPMiddleware):
                 extra={
                     "event": "access",
                     "request_id": rid,
+                    "trace_id": trace_id,
                     "tenant_id": tenant_id,
                     "role": role,
                     "path": request.url.path,
@@ -44,4 +49,5 @@ class ObservabilityMiddleware(BaseHTTPMiddleware):
             observe_request(request.url.path, request.method, status, latency_ms)
             if response is not None:
                 response.headers["X-Request-Id"] = rid
+                response.headers["X-Trace-Id"] = trace_id
                 response.headers["X-Response-Time-ms"] = str(latency_ms)

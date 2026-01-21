@@ -12,7 +12,7 @@ class JsonFormatter(logging.Formatter):
             "msg": record.getMessage(),
         }
         # extras (se existirem)
-        for k in ("request_id", "tenant_id", "role", "path", "method", "status_code", "latency_ms", "event"):
+        for k in ("request_id", "trace_id", "tenant_id", "role", "path", "method", "status_code", "latency_ms", "event"):
             if hasattr(record, k):
                 base[k] = getattr(record, k)
 
