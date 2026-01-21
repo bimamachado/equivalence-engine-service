@@ -14,6 +14,7 @@ from app.admin_routes import router as admin_router
 from app.admin_dlq_routes import router as dlq_router
 from app.metrics import router as metrics_router
 from app.readiness import router as readiness_router
+from app.ui_routes import router as ui_router
 app = FastAPI(title="Equivalence Engine Service", version="1.0.0")
 
 @app.on_event("startup")
@@ -33,6 +34,7 @@ app.include_router(dash_router)
 app.include_router(admin_router)
 app.include_router(dlq_router)
 app.include_router(metrics_router)
+app.include_router(ui_router)
 app.add_middleware(ObservabilityMiddleware)
 app.add_middleware(RateLimitMiddleware)
 app.add_middleware(ApiKeyAuthMiddleware)
