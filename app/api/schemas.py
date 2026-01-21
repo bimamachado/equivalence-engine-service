@@ -8,7 +8,7 @@ RuleName = Literal["aprovacao", "carga_horaria", "nivel", "validade_temporal", "
 class DisciplineInput(BaseModel):
     nome: str = Field(..., min_length=1, max_length=200)
     carga_horaria: conint(gt=0, le=2000)
-    ementa: str = Field(..., min_length=10, max_length=20000)
+    ementa: str = Field(..., min_length=5, max_length=20000)
     aprovado: Optional[bool] = None  # origem geralmente tem; destino não precisa
     nivel: Optional[Literal["basico", "intermediario", "avancado"]] = None
     ano_conclusao: Optional[conint(ge=1950, le=2100)] = None
