@@ -18,7 +18,15 @@ PUBLIC_PATHS = {
 }
 
 def _is_public(path: str) -> bool:
-    return path in PUBLIC_PATHS
+    if path in PUBLIC_PATHS:
+        return True
+
+    # allow paths that are under a public prefix, e.g. /docs/index.html
+    for p in PUBLIC_PATHS:
+        if path.startswith(p + "/"):
+            return True
+
+    return False
 
 class ApiKeyAuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):

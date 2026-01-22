@@ -19,6 +19,11 @@ from app.readiness import router as readiness_router
 from app.ui_routes import router as ui_router
 app = FastAPI(title="Equivalence Engine Service", version="1.0.0")
 
+# Mount DOCS directory at /docs so doc files are served by the app
+docs_path = Path(__file__).resolve().parents[1] / "DOCS"
+if docs_path.exists():
+    app.mount("/docs", StaticFiles(directory=str(docs_path), html=True), name="docs")
+
 @app.on_event("startup")
 def _startup():
     setup_logging()
