@@ -182,3 +182,132 @@ Notas de configuração
  - `EMBED_URL`/`LLM_URL` apontam para serviços externos de embeddings/LLM; o mapper chamará esses endpoints quando configurado para tal.
  - Em produção, use um secret manager (não comitar `.env` com segredos).
 
+## Exemplo específico enviado (entrada) — explicação detalhada dos campos
+
+Entrada de exemplo enviada para o motor (fornecida por você):
+
+```json
+{
+  "request_id": "ex-deferido-001",
+  "origem": {
+    "instituicao": "Universidade Federal do Rio de Janeiro (UFRJ)",
+    "codigo": "BCC310",
+    "nome": "Banco de Dados",
+    "carga_horaria": 60,
+    "credito": 4,
+    "nivel": "intermediario",
+    "ementa": "Modelagem relacional, algebra relacional, SQL, normalização, transações e integridade.",
+    "objetivos": [
+      "Modelar bancos de dados",
+      "Escrever consultas SQL complexas"
+    ]
+  },
+  "destino": {
+    "instituicao": "Universidade Estadual de Campinas (UNICAMP)",
+    "codigo": "BCC343",
+    "nome": "Sistemas de Banco de Dados",
+    "carga_horaria": 60,
+    "credito": 4,
+    "nivel": "intermediario",
+    "ementa": "Modelagem, SQL, índices, transações, e desempenho de bancos de dados.",
+    "objetivos": [
+      "Projetar esquemas relacionais",
+      "Optimizar consultas"
+    ]
+  },
+  "context": {
+    "aluno": "Mariana Costa",
+    "matricula": "201912345"
+  },
+  "taxonomy_version": "2026.01",
+  "policy_version": "v3",
+  "expected": "deferido"
+}
+```
+
+Explicação campo-a-campo (entrada):
+
+- `request_id`: identificador de correlação; usado em logs, auditoria e para ligar resposta/resultado à requisição original.
+- `origem` / `destino`: objetos representando a disciplina cursada (`origem`) e a disciplina alvo (`destino`). O motor utiliza principalmente a `ementa` para mapeamento semântico (via mapper), e os demais campos para regras e transparência:
+  - `instituicao`, `codigo`, `nome`: campos informativos para UI/audit; não alteram diretamente o matching sem regras explícitas.
+  - `carga_horaria`: comparada à do destino para regras de `carga_horaria` e para a lógica de borderline/tolerância; afeta decisão automática quando há discrepância.
+  - `credito`: campo informativo (pode ser usado em regras adicionais se configurado).
+  - `nivel`: categorização (`basico`/`intermediario`/`avancado`) usada para calcular penalidade por nível quando aplicável.
+  - `ementa`: texto livre que será enviado ao `mapper` — etapa em que a LLM/embeddings é chamada para extrair conceitos e confidences.
+  - `objetivos`: lista opcional que pode ajudar mappers a priorizar conceitos e explicar correspondências.
+- `context`: metadados operacionais (nome do aluno, matrícula, etc.) — importante para auditoria e histórico, não influencia a lógica do motor por padrão.
+- `taxonomy_version`: versão da taxonomia usada para mapear `ementa` → `node_id`.
+- `policy_version`: versão da política (thresholds e pesos) a ser utilizada na função `final_score` e `decide`.
+- `expected`: campo EXTRAS (não parte do schema oficial) usado em testes que indica resultado esperado; não influencia o processamento.
+
+## Exemplo específico retornado (saída) — explicação detalhada dos campos
+
+Resposta fornecida pelo motor no exemplo:
+
+```json
+{
+  "request_id": "ex-deferido-001",
+  "decisao": "DEFERIDO",
+  "score": 100,
+  "breakdown": {
+    "cobertura": 1,
+    "cobertura_critica": 1,
+    "penalidade_nivel": 0
+  },
+  "hard_rules": [
+    { "rule": "input_minimo", "ok": true, "details": null },
+    { "rule": "aprovacao", "ok": true, "details": null },
+    { "rule": "carga_horaria", "ok": true, "details": null },
+    { "rule": "validade_temporal", "ok": true, "details": "Não aplicável" },
+    { "rule": "nivel", "ok": true, "details": "Não aplicável no MVP" }
+  ],
+  "faltantes": [],
+  "criticos_faltantes": [],
+  "justificativa_curta": "DEFERIDO: Score e critérios atendidos para deferimento automático.",
+  "justificativa_detalhada": "Decisão: DEFERIDO\nMotivo: Score e critérios atendidos para deferimento automático.\nScore final: 100/100\nCobertura: 1.00\nCobertura crítica: 1.00\nPenalidade de nível: 0.00\nCarga horária: origem=60h, destino=60h",
+  "evidence": {
+    "covered_concepts": [
+      { "node_id": 1001, "weight": 0.6569, "confidence": 0.7599, "evidence": [] },
+      { "node_id": 1012, "weight": 0.6374, "confidence": 0.7462, "evidence": [] }
+    ],
+    "missing_concepts": [],
+    "missing_critical_concepts": []
+  },
+  "degraded_mode": false,
+  "model_version": "mapper-embed+llm-0.1",
+  "policy_version": "v3",
+  "taxonomy_version": "2026.01",
+  "timings_ms": { "validate_ms": 0, "hard_rules": 0, "map": 1077, "score": 0, "decide": 0, "justify": 0, "total": 1077 },
+  "meta": { "origin_vec_size": 2, "dest_vec_size": 2, "mapper_used": "primary" }
+}
+```
+
+Explicação campo-a-campo (saída):
+
+- `request_id`: igual ao de entrada para correlação.
+- `decisao`: decisão final — aqui `DEFERIDO` indica que os thresholds e regras foram atendidos para aprovação automática.
+- `score` (0-100): valor numérico final calculado pelo `final_score`.
+- `breakdown`:
+  - `cobertura`: 1 significa 100% dos conceitos relevantes do destino foram cobertos pela origem.
+  - `cobertura_critica`: 1 significa que todos os conceitos marcados como críticos estão cobertos.
+  - `penalidade_nivel`: 0 indica que não foi aplicada penalidade por diferença de nível.
+- `hard_rules`: lista com o resultado de cada verificação determinística executada antes do mapeamento; `ok: true` mostra que a regra foi satisfeita. `details` pode conter observações (ex.: "Não aplicável").
+- `faltantes` / `criticos_faltantes`: arrays vazios indicam que não há conceitos pendentes que impeçam o deferimento.
+- `justificativa_curta` / `justificativa_detalhada`: explicações legíveis para UI/audit; a detalhada traz score e pontos relevantes.
+- `evidence.covered_concepts`: mostras precisas dos `node_id` que contribuíram para a correspondência, com `weight` e `confidence` (fornecidos pelo mapper). `evidence` é um array de trechos/textos que justificam o mapeamento quando disponível.
+- `degraded_mode`: false indica que o mapper primário funcionou corretamente (nenhum fallback).
+- `model_version`: versão/identificador do mapper ou pipeline que gerou as correspondências.
+- `timings_ms`: tempos por etapa; neste exemplo o passo `map` (chamada ao mapper/LLM) levou ~1077ms.
+- `meta`: dados auxiliares (tamanhos dos vetores e qual mapper foi usado).
+
+Interpretação prática deste caso
+
+- Origem e destino têm `carga_horaria` idêntica (60) e `nivel` igual — por isso não há penalidade e a regra de carga passa.
+- O mapper retornou conceitos suficientes com confiança acima do `confidence_cutoff`, resultando em `cobertura=1` e `score=100`.
+- Como `policy.exigir_criticos` foi atendido (`cobertura_critica=1`), não há bloqueio crítico.
+- Resultado final: `DEFERIDO` automático sem necessidade de revisão humana.
+
+---
+
+Agora commito e faço push desta atualização na documentação.
+
