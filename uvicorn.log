@@ -1,19 +1,2 @@
-INFO:     127.0.0.1:64775 - "POST /v1/equivalences/evaluate HTTP/1.1" 500 Internal Server Error
-INFO:     127.0.0.1:64805 - "POST /v1/equivalences/evaluate HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55337 - "GET /docs?id=ba0c89b3-591b-4732-9eb8-c635c74e090e&vscodeBrowserReqId=1768411016206 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55337 - "GET /openapi.json HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63325 - "POST /v1/equivalences/evaluate HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63329 - "POST /v1/equivalences/evaluate HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63331 - "POST /v1/equivalences/evaluate HTTP/1.1" 422 Unprocessable Content
-INFO:     127.0.0.1:60436 - "POST /v1/equivalences/evaluate HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60447 - "POST /v1/equivalences/evaluate HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60452 - "POST /v1/equivalences/evaluate HTTP/1.1" 422 Unprocessable Content
-INFO:     127.0.0.1:60456 - "POST /v1/equivalences/evaluate HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60458 - "POST /v1/equivalences/evaluate HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60460 - "POST /v1/equivalences/evaluate HTTP/1.1" 422 Unprocessable Content
-INFO:     127.0.0.1:60464 - "POST /v1/equivalences/evaluate HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60466 - "POST /v1/equivalences/evaluate HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60469 - "POST /v1/equivalences/evaluate HTTP/1.1" 422 Unprocessable Content
-INFO:     127.0.0.1:60477 - "POST /v1/equivalences/evaluate HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60483 - "POST /v1/equivalences/evaluate HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60485 - "POST /v1/equivalences/evaluate HTTP/1.1" 422 Unprocessable Content
+nohup: ignoring input
+nohup: failed to run command 'python3.13': No such file or directory
