@@ -34,6 +34,34 @@ Entrada (EvaluateRequest) — campos principais
 - `taxonomy_version`, `policy_version` (strings)
 - `options` (`EvaluateOptions`): `return_evidence` (bool), `allow_degraded_fallback` (bool)
 
+## Taxonomia e Versões
+
+- **Taxonomia:** conjunto canônico de categorias/labels usado para mapear texto (`ementa`) a `node_id` do grafo de conhecimento. Serve para normalizar entradas, suportar regras hard-coded e permitir indexação/consulta semântica.
+- **`taxonomy_version`:** identifica a versão da taxonomia usada no processamento (ex.: `tax-v2025-11-01`, `2026.01`). Deve acompanhar cada decisão para permitir reavaliação ou auditoria quando a taxonomia mudar.
+
+- **`version` (esquema):** versão do esquema do payload (ex.: `v1`, `v2`). Usada por validadores/parsers para compatibilidade.
+
+- **`model_version`:** identifica o artefato de modelo usado no mapeamento/scoring (ex.: `openai-embed-1.2`, `mapper-embed+llm-0.1`). Essencial para reprodutibilidade e investigação de regressões.
+
+- **`policy_version`:** versão da política de decisão (thresholds, flags, regras ativadas). Ex.: `policy-v3`. Deve constar em cada decisão para rastreabilidade e permitir rollback quando necessário.
+
+Recomendações operacionais:
+- Registrar `taxonomy_version`, `model_version` e `policy_version` por decisão e em logs de auditoria.
+- Ao atualizar `model_version` ou `policy_version`, rodar testes controlados (A/B) e documentar impacto.
+- Quando `taxonomy_version` muda de forma incompatível, considerar reindexação ou reprocessamento de históricos críticos e manter changelog de mapeamentos antigos→novos.
+
+Exemplo mínimo de metadados incluídos no payload/registro:
+
+```
+{
+  "version": "v2",
+  "taxonomy_version": "tax-v2026-01",
+  "model_version": "openai-embed-1.2",
+  "policy_version": "policy-v3",
+  "metadata": { ... }
+}
+```
+
 Exemplo de entrada (simplificado):
 
 ```json
