@@ -1,5 +1,7 @@
 from __future__ import annotations
 from fastapi import FastAPI
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
 from app.bootstrap import init_db
 
 from app.middlewares import ApiKeyAuthMiddleware

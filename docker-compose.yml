@@ -13,6 +13,7 @@ services:
       - mock-llm
     volumes:
       - ./:/app
+      - ./DOCS:/app/DOCS:ro
 
   worker:
     build: .
@@ -24,6 +25,7 @@ services:
       - redis
     volumes:
       - ./:/app
+      - ./DOCS:/app/DOCS:ro
     restart: unless-stopped
 
   mock-embed:
