@@ -9,7 +9,7 @@ Documentação (arquivos que eu adicionei):
  - Recent changes: added Test UI examples and a small engine behaviour change (borderline carga_horaria => ANALISE_HUMANA). See [README.full.md](README.full.md) and [app/templates/test_ui.html](app/templates/test_ui.html#L1).
 - `README.deploy.md`: instruções e checklist para deploy em produção (variáveis sensíveis, migrations, backups, workers, observabilidade).
 - `DEVELOPER.md`: guia de desenvolvimento local (venv, instalar deps, rodar, debug, como adicionar mappers e regras).
-- `API_EXAMPLES.md`: exemplos práticos de chamadas à API (curl e Python) e exemplos de payload/response.
+- `API_EXAMPLES.md`: exemplos práticos de chamadas à API (curl e Python) e exemplos de payload/response. Veja também `DOCS/USAGE.md` para guia rápido e notas sobre `X-API-Key`.
 - `RUNBOOK.md`: runbook operacional com troubleshooting rápido, comandos para checagens e procedimentos de manutenção.
 - `CONTRIBUTING.md`: orientações para contribuir (PRs, estilo, testes).
 - `CHANGELOG.md`: changelog (seção Unreleased para alterações recentes).

@@ -31,7 +31,7 @@ Abaixo cada etapa do fluxo com sua finalidade e um pequeno exemplo demonstrando 
 1) Recepção do pedido (HTTP)
   - Finalidade: receber a requisição do cliente e expor o contrato (endpoint). Atua como porta de entrada do sistema.
   - Onde: [app/api/routes.py](app/api/routes.py), [app/api/batch_routes.py](app/api/batch_routes.py)
-  - Exemplo: `POST /v1/evaluate` com payload JSON (ver seção de exemplos no documento).
+  - Exemplo: `POST /v1/equivalences/evaluate` com payload JSON (ver seção de exemplos no documento).
 
 2) Validação / Parsing
   - Finalidade: garantir que o payload esteja completo e no formato esperado antes de processar (falha rápida para input inválido).
@@ -66,7 +66,7 @@ Abaixo cada etapa do fluxo com sua finalidade e um pequeno exemplo demonstrando 
 8) Enfileiramento / Processamento Assíncrono
   - Finalidade: quando for batch ou processamento pesado, enfileirar jobs para workers; permite escalabilidade e desacoplamento.
   - Onde: [app/queue.py](app/queue.py), `rq` e [app/worker.py](app/worker.py)
-  - Exemplo: `POST /v1/batch` cria job em Redis via RQ; `worker` processa e grava resultado no DB.
+  - Exemplo: `POST /v1/equivalences/batch` cria job em Redis via RQ; `worker` processa e grava resultado no DB.
 
 9) Persistência, cache e auditoria
   - Finalidade: salvar decisões, justificativas e metas de execução; usar cache para acelerar mapeamentos e consultas; auditar requests para conformidade.

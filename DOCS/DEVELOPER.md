@@ -40,7 +40,7 @@ python -m app.seed
 
 Rodando a aplicação
 ```bash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
 ```
 
 Rodando testes
@@ -65,12 +65,13 @@ Trabalhando com filas (RQ)
 - Enfileire jobs via `app/queue.py` ou endpoints batch.
 - Rode worker local para desenvolvimento:
 ```bash
-rq worker -u redis://localhost:6379/0 equivalence
+rq worker -u redis://127.0.0.1:6379/0 equivalence
 ```
 
 Debugging
 - Use logs (`app/logging_setup.py`) e `uvicorn` em modo `--reload`.
 - Para investigar jobs RQ: `rq info -u redis://localhost:6379/0`.
+ Para investigar jobs RQ: `rq info -u redis://127.0.0.1:6379/0`.
 
 Contribuição
 - Abra PRs pequenos, escreva testes e descreva mudanças no corpo do PR.

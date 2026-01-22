@@ -37,15 +37,15 @@ Exemplo `.env` (desenvolvimento)
 POSTGRES_USER=equivalence
 POSTGRES_PASSWORD=dev-equivalence-pass
 POSTGRES_DB=equivalence
-DATABASE_URL=postgresql+psycopg2://equivalence:dev-equivalence-pass@localhost:5432/equivalence
-REDIS_URL=redis://localhost:6379/0
+DATABASE_URL=postgresql+psycopg2://equivalence:dev-equivalence-pass@127.0.0.1:5432/equivalence
+REDIS_URL=redis://127.0.0.1:6379/0
 RQ_QUEUE_NAME=equivalence
 
 API_KEY_SALT=change-this-to-a-long-random-string
 TENANT_API_KEY=dev-tenant-abc123
-ADMIN_API_KEY=dev-admin-abc123
-AUDITOR_API_KEY=dev-auditor-abc123
-CLIENT_API_KEY=dev-client-abc123
+ADMIN_API_KEY=dev-admin-123
+AUDITOR_API_KEY=dev-auditor-123
+CLIENT_API_KEY=dev-client-123
 
 EMBED_URL=http://localhost:9001
 EMBED_API_KEY=
@@ -72,7 +72,7 @@ source .venv/bin/activate   # ou .\.venv\Scripts\Activate.ps1 no Windows
 pip install -r requirements.txt
 # garanta que .env está configurado
 alembic upgrade head
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
 ```
 
 Rodando o worker (dev)
@@ -102,7 +102,7 @@ API — macro → micro (endpoints e exemplos)
 Exemplo mínimo (curl):
 
 ```bash
-curl -sS -X POST http://localhost:8000/v1/equivalences/evaluate \
+curl -sS -X POST http://127.0.0.1:8001/v1/equivalences/evaluate \
   -H 'Content-Type: application/json' \
   -H 'X-API-Key: dev-admin-abc123' \
   -d '{
@@ -119,7 +119,7 @@ Exemplo em Python (requests):
 ```python
 import requests
 url='http://localhost:8000/v1/equivalences/evaluate'
-headers={'X-API-Key':'dev-admin-abc123','Content-Type':'application/json'}
+headers={'X-API-Key':'dev-admin-123','Content-Type':'application/json'}
 payload={
   'request_id':'req-001',
   'origem':{'nome':'Algoritmos','carga_horaria':60,'ementa':'...','aprovado':True,'nivel':'intermediario'},
@@ -140,7 +140,7 @@ Resposta esperada: objeto `EvaluateResponse` com `decisao`, `score`, `breakdown`
 Exemplo de enfileiramento (curl):
 
 ```bash
-curl -X POST http://localhost:8000/v1/equivalences/batch -H 'Content-Type: application/json' -d @batch_request.json
+curl -X POST http://127.0.0.1:8001/v1/equivalences/batch -H 'Content-Type: application/json' -d @batch_request.json
 ```
 
 3) Admin / Reprocess / DLQ

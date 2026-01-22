@@ -2,7 +2,7 @@
 
 ## Verificações rápidas
 - API:
-  - `curl -I http://localhost:8000/health` (ou endpoint de readiness)
+  - `curl -I http://127.0.0.1:8001/health` (ou endpoint de readiness)
 - Postgres:
   - `docker compose ps` / `pg_isready` / conectar com psql
 - Redis:
@@ -15,7 +15,7 @@
 2. Verifique a fila (`rq info -u <REDIS_URL>`).
 3. Inicie um worker em modo foreground para ver logs:
 ```bash
-rq worker -u redis://localhost:6379/0 equivalence
+rq worker -u redis://127.0.0.1:6379/0 equivalence
 ```
 
 ### Jobs presos (DLQ)

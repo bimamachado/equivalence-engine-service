@@ -9,7 +9,7 @@ POST /v1/equivalences/evaluate
 
 Curl example:
 ```bash
-curl -sS -X POST http://localhost:8000/v1/equivalences/evaluate \
+curl -sS -X POST http://127.0.0.1:8001/v1/equivalences/evaluate \
   -H 'Content-Type: application/json' \
   -H 'X-API-Key: dev-admin-abc123' \
   -d '{
@@ -25,7 +25,7 @@ Python (requests):
 ```python
 import requests
 url='http://localhost:8000/v1/equivalences/evaluate'
-headers={'X-API-Key':'dev-admin-abc123','Content-Type':'application/json'}
+headers={'X-API-Key':'dev-admin-123','Content-Type':'application/json'}
 payload={...}
 resp=requests.post(url,json=payload,headers=headers)
 print(resp.status_code)
@@ -38,7 +38,7 @@ POST /v1/equivalences/batch
 
 Curl example:
 ```bash
-curl -X POST http://localhost:8000/v1/equivalences/batch -H 'Content-Type: application/json' -d @batch_request.json
+curl -X POST http://127.0.0.1:8001/v1/equivalences/batch -H 'Content-Type: application/json' -d @batch_request.json
 ```
 
 ## Expected response (evaluate)

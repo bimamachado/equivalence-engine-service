@@ -106,7 +106,7 @@ source .venv/bin/activate   # ou .\.venv\Scripts\Activate.ps1 no Windows
 pip install -r requirements.txt
 # garanta que .env está configurado
 alembic upgrade head
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
 ```
 
 Rodando o worker (dev)
