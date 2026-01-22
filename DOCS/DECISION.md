@@ -134,3 +134,51 @@ Referências no código
 Se quiser, posso também:
 - adicionar exemplos JSON completos (entrada + saída) para 4 cenários (DEFERIDO/INDEFERIDO/COMPLEMENTO/ANALISE_HUMANA),
 - ou criar scripts em `scripts/` que rodem esses exemplos automaticamente contra a instância local.
+
+Arquivos Python principais envolvidos
+
+ - `app/engine/service.py` — orquestra o fluxo completo (validação, regras, mapeamento, scoring, decisão, justificativa, auditoria).
+ - `app/engine/hard_rules.py` — regras determinísticas que podem indeferir imediatamente.
+ - `app/engine/scoring.py` — construção de vetores, cobertura, penalidades e cálculo do score final.
+ - `app/engine/decision.py` — mapeia score/flags para decisão final.
+ - `app/engine/justification.py` — gera justificativas legíveis (curta e detalhada).
+ - `app/mapper/` — mappers que chamam LLM/embeddings (`embedding_llm_mapper.py`, `openai_mapper.py`, `stub_mapper.py`).
+ - `app/taxonomy/store.py` — acesso à taxonomia (nós, relações, ids críticos).
+ - `app/cache/cache.py` — cache local de mapeamentos por hash de texto.
+ - `app/audit/repository.py` — grava eventos de auditoria/resultados.
+ - `app/api/schemas.py` — Pydantic models (entrada/saída) usados pela API.
+ - `app/main.py` — ponto de montagem da app (rotas, static files, middlewares).
+ - `app/seed.py` — utilitário para popular chaves de API em dev.
+ - `app/config.py` — configurações e leitura de variáveis de ambiente.
+
+Configuração — exemplo de `.env`
+
+Este serviço depende de variáveis de ambiente para conexão e comportamento. Exemplo mínimo para desenvolvimento:
+
+```
+DATABASE_URL=postgresql+psycopg2://equivalence:dev-equivalence-pass@127.0.0.1:5432/equivalence
+REDIS_URL=redis://127.0.0.1:6379/0
+RQ_QUEUE_NAME=equivalence
+
+API_KEY_SALT=change-this-to-a-long-random-string
+ADMIN_API_KEY=dev-admin-123
+AUDITOR_API_KEY=dev-auditor-123
+CLIENT_API_KEY=dev-client-123
+
+EMBED_URL=http://127.0.0.1:9001
+EMBED_API_KEY=
+LLM_URL=http://127.0.0.1:9002
+LLM_API_KEY=
+
+# Optional: host/port used by local uvicorn run
+HOST=127.0.0.1
+PORT=8001
+```
+
+Notas de configuração
+
+ - `API_KEY_SALT` é usada para hashear chaves de API; altere para um valor forte em produção.
+ - `ADMIN_API_KEY`, `AUDITOR_API_KEY`, `CLIENT_API_KEY` são chaves de exemplo usadas pelo `app/seed.py` para popular dados de dev.
+ - `EMBED_URL`/`LLM_URL` apontam para serviços externos de embeddings/LLM; o mapper chamará esses endpoints quando configurado para tal.
+ - Em produção, use um secret manager (não comitar `.env` com segredos).
+
