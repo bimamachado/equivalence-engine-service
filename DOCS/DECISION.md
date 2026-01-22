@@ -307,6 +307,44 @@ Interpretação prática deste caso
 - Como `policy.exigir_criticos` foi atendido (`cobertura_critica=1`), não há bloqueio crítico.
 - Resultado final: `DEFERIDO` automático sem necessidade de revisão humana.
 
+## Definições detalhadas das decisões
+
+Esta seção explica, em linguagem operacional, o que significa cada decisão, quando é usada e qual o papel no fluxo de trabalho.
+
+- `DEFERIDO`
+  - O que é: decisão automática que aceita a equivalência entre a disciplina `origem` e a disciplina `destino` sem necessidade de intervenção humana.
+  - Quando ocorre: quando todas as regras e thresholds aplicáveis são satisfeitos — isto é, `score >= policy.min_score_deferir`, cobertura crítica atendida (se exigida), e não existem bloqueios por *hard rules* ou por políticas de nível/carga.
+  - Para que serve: permite processamento em escala sem aumentar o custo humano; gera um registro auditável e a justificativa detalhada para rastreabilidade.
+  - Efeito operacional: o estudante recebe a equivalência aprovada; o sistema pode persistir o resultado no repositório de equivalências/auditoria.
+
+- `INDEFERIDO`
+  - O que é: decisão automática que rejeita a equivalência proposta.
+  - Quando ocorre: quando falha alguma regra bloqueante (hard rule), ou quando o `score` é insuficiente (abaixo de `min_score_complemento`) ou quando conceitos críticos não foram contemplados e `policy.exigir_criticos` está ativo.
+  - Para que serve: protege a integridade acadêmica evitando aprovações errôneas; sinaliza que a disciplina não atende os requisitos mínimos para equivalência.
+  - Efeito operacional: a requisição é finalizada como rejeitada; o sistema deve fornecer justificativa detalhada para permitir recurso/manual review, se aplicável.
+
+- `COMPLEMENTO`
+  - O que é: decisão intermediária indicando que a equivalência é plausível, mas há lacunas significativas que exigem complementos (atividades, disciplina(s) complementares ou documentação adicional) para aprovar automaticamente.
+  - Quando ocorre: quando `score >= policy.min_score_complemento` mas `score < policy.min_score_deferir`, ou quando há faltantes não críticos que podem ser resolvidos com complementos.
+  - Para que serve: oferece uma via operacional para reduzir revisões humanas completas, propondo ações corretivas (complemento) — p.ex., cursar conteúdo complementar ou apresentar evidências adicionais.
+  - Efeito operacional: o sistema pode registrar recomendações de complementos (texto em `justificativa_detalhada`) e abrir um fluxo para registrar cumprimento do complemento e reavaliação.
+
+- `ANALISE_HUMANA`
+  - O que é: indicação de que o caso deve ser revisado por um avaliador humano (coordenador de curso, comissão ou equipe técnica).
+  - Quando ocorre: usado em cenários conservadores ou ambíguos, incluindo, mas não limitado a:
+    - `degraded_mode == True` (mapper primário falhou/indisponível),
+    - regra de borderline de carga horária aplicada (origem dentro da tolerância mas menor que destino),
+    - casos onde a política requer revisão manual por outras regras locais/administrativas,
+    - quando o `score` ou as evidências não permitem uma conclusão confiável mesmo que thresholds sejam próximos.
+  - Para que serve: garante que decisões sensíveis ou com risco de impacto sejam analisadas por humanos, preservando qualidade e conformidade acadêmica.
+  - Efeito operacional: a requisição é colocada em uma fila de revisão humana (ou marcada para intervenção manual); o sistema deve expor um conjunto de evidências e a justificativa detalhada para facilitar a revisão.
+
+Observações adicionais
+
+- As decisões `DEFERIDO`/`INDEFERIDO` e `COMPLEMENTO` são projetadas para automação com níveis de confiança controlados por `policy`.
+- `ANALISE_HUMANA` é o mecanismo de defesa para cenários incertos ou quando o pipeline de IA está degradado; para reduzir o volume de `ANALISE_HUMANA` é comum calibrar `policy.min_score_deferir` e `min_score_complemento`, melhorar o mapper e usar evidências mais ricas.
+
+
 ---
 
 Agora commito e faço push desta atualização na documentação.
