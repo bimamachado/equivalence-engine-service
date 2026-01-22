@@ -13,6 +13,8 @@ PUBLIC_PATHS = {
     "/metrics",
     "/test-ui",
     "/doc",
+    "/index.html",
+    "/favicon.ico",
 }
 
 def _is_public(path: str) -> bool:
