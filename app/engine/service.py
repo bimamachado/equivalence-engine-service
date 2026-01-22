@@ -3,6 +3,7 @@ from typing import Optional
 from app.api.schemas import EvaluateRequest, EvaluateResponse, EvidenceBlock, ConceptEvidence, TimingsMs, ScoreBreakdown
 from app.engine.hard_rules import apply_hard_rules, hard_rules_block_decision
 from app.engine.scoring import build_vector, coverage, critical_coverage, level_penalty, final_score
+import math
 from app.engine.decision import decide
 from app.engine.justification import build_justification
 from app.engine.utils import sha256_text, timer_ms
@@ -112,8 +113,22 @@ class EquivalenceEngine:
             timings.score = t()
 
             # 5) decisão
+            # Caso borderline: origem tem carga menor que destino, mas ainda dentro
+            # da tolerância (ex: destino=75, tolerancia=0.8 -> mínimo=60, origem=60).
+            # Em cenários assim podemos optar por encaminhar para análise humana
+            # em vez de decidir automaticamente.
             with timer_ms() as t:
-                decisao, motivo = decide(req.policy, score, cov_crit, degraded_mode=degraded)
+                min_required = int(math.ceil(req.destino.carga_horaria * req.policy.tolerancia_carga))
+                if (
+                    req.origem.carga_horaria is not None
+                    and req.destino.carga_horaria is not None
+                    and req.origem.carga_horaria < req.destino.carga_horaria
+                    and req.origem.carga_horaria >= min_required
+                ):
+                    decisao = "ANALISE_HUMANA"
+                    motivo = "Diferença de carga horária dentro da tolerância — requer análise humana."
+                else:
+                    decisao, motivo = decide(req.policy, score, cov_crit, degraded_mode=degraded)
             timings.decide = t()
 
             # 6) justificativa

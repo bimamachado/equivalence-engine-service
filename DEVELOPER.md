@@ -2,6 +2,11 @@
 
 Setup local dev environment
 
+**Recent changes (dev)**
+- Test UI: see [app/templates/test_ui.html](app/templates/test_ui.html#L1) — contains full and minimal payloads for manual testing.
+- Engine behavior: `app/engine/service.py` now forwards borderline carga_horaria cases to `ANALISE_HUMANA`. Add or update unit/integration tests if you rely on previous behaviour.
+- Secrets: avoid storing `LLM_API_KEY` in `.env` in the repo; prefer a secrets manager or docker-compose secrets and rotate any key already committed.
+
 1. Crie e ative o virtualenv
 
 Linux / macOS / WSL:

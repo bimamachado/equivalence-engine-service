@@ -2,6 +2,11 @@
 
 Resumo rápido de como rodar o projeto localmente.
 
+**Recent changes**
+- Test UI: added example payloads (full + minimal) for DEFERIDO / INDEFERIDO / ANALISE_HUMANA in [app/templates/test_ui.html](app/templates/test_ui.html#L1).
+- Decision logic: `app/engine/service.py` now treats borderline carga_horaria cases as `ANALISE_HUMANA` (see tests and examples in the Test UI).
+- Security: do not commit `LLM_API_KEY` in `.env`; if you placed a real key here, rotate it and use a secret manager or docker-compose secrets.
+
 Requisitos
 - Python 3.10+
 - Recomenda-se criar um virtual environment (`.venv`).

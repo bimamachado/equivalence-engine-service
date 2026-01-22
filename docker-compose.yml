@@ -14,6 +14,18 @@ services:
     volumes:
       - ./:/app
 
+  worker:
+    build: .
+    image: equivalence-engine-service:latest
+    env_file:
+      - .env
+    command: rq worker -u redis://redis:6379/0 equivalence
+    depends_on:
+      - redis
+    volumes:
+      - ./:/app
+    restart: unless-stopped
+
   mock-embed:
     build: .
     image: equivalence-engine-mock-embed:latest

@@ -12,6 +12,7 @@ PUBLIC_PATHS = {
     "/redoc",
     "/metrics",
     "/test-ui",
+    "/doc",
 }
 
 def _is_public(path: str) -> bool:

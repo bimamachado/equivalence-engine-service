@@ -54,7 +54,37 @@ def get_job(job_id: str, db: Session = Depends(get_db)):
 @router.get("/v1/jobs/{job_id}/results")
 def get_job_results(job_id: str, db: Session = Depends(get_db)):
     items = db.query(models.JobItem).filter(models.JobItem.job_id == job_id).all()
-    return [
-        {"item_id": it.id, "status": it.status, "result_id": it.result_id, "error": it.error}
-        for it in items
-    ]
+    out = []
+    for it in items:
+        result_payload = None
+        if it.result_id:
+            # tenta recuperar resultado completo salvo em EquivalenceResult
+            r = db.get(models.EquivalenceResult, it.result_id)
+            if r:
+                result_payload = {
+                    "id": r.id,
+                    "request_id": r.request_id,
+                    "decision": r.decision,
+                    "score": r.score,
+                    "breakdown": r.breakdown,
+                    "missing": r.missing,
+                    "missing_critical": r.missing_critical,
+                    "justificativa_curta": r.justificativa_curta,
+                    "justificativa_detalhada": r.justificativa_detalhada,
+                    "degraded_mode": r.degraded_mode,
+                    "model_version": r.model_version,
+                    "policy_version": r.policy_version,
+                    "taxonomy_version": r.taxonomy_version,
+                    "timings_ms": r.timings_ms,
+                    "created_at": (r.created_at.isoformat() if r.created_at else None),
+                }
+
+        out.append({
+            "item_id": it.id,
+            "status": it.status,
+            "result_id": it.result_id,
+            "error": it.error,
+            "result": result_payload,
+        })
+
+    return out

@@ -34,6 +34,11 @@ rq worker -u redis://localhost:6379/0 equivalence
 - Backup diário: `pg_dump` ou estratégia de backup contínuo.
 - Limpeza de filas antigas e logs grandes.
 
+**Operational notes (recent changes)**
+- The Test UI at [app/templates/test_ui.html](app/templates/test_ui.html#L1) provides manual payloads to reproduce DEFERIDO / INDEFERIDO / ANALISE_HUMANA scenarios.
+- If you see unexpected human-review routes, check `app/engine/service.py` for the borderline `carga_horaria` handling.
+- Security: if `LLM_API_KEY` was added to `.env`, rotate it immediately and move secrets to a secure store.
+
 ## Contato e escalonamento
 - Primeiro nível: desenvolvedor responsável
 - Segundo nível: time de infra (DB/redis)

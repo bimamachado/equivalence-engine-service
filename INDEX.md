@@ -6,6 +6,7 @@ Documentação (arquivos que eu adicionei):
 
 - `README.md`: guia principal (resumo + link para o guia completo). Contém instruções rápidas para rodar, exemplos e referência.
 - `README.full.md`: guia completo (macro → micro). Documentação detalhada da arquitetura, endpoints, exemplos e comandos.
+ - Recent changes: added Test UI examples and a small engine behaviour change (borderline carga_horaria => ANALISE_HUMANA). See [README.full.md](README.full.md) and [app/templates/test_ui.html](app/templates/test_ui.html#L1).
 - `README.deploy.md`: instruções e checklist para deploy em produção (variáveis sensíveis, migrations, backups, workers, observabilidade).
 - `DEVELOPER.md`: guia de desenvolvimento local (venv, instalar deps, rodar, debug, como adicionar mappers e regras).
 - `API_EXAMPLES.md`: exemplos práticos de chamadas à API (curl e Python) e exemplos de payload/response.

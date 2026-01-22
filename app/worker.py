@@ -53,9 +53,61 @@ def process_job_item(job_id: str, item_id: str):
 
         resp = engine.evaluate(req, tenant_id)
 
-        # salva resultado com constraint unique (tenant_id, request_id)
-        # ... seu bloco de save já existente ...
-        # se der violação, você trata abaixo
+        # Salva resultado em EquivalenceResult e marca item como concluído
+        try:
+            import uuid as _uuid
+            from app.repos import ResultRepo
+
+            result_id = str(_uuid.uuid4())
+            origem_nome = payload.get("origem", {}).get("nome")
+            origem_carga = payload.get("origem", {}).get("carga_horaria")
+            destino_nome = payload.get("destino", {}).get("nome")
+            destino_carga = payload.get("destino", {}).get("carga_horaria")
+
+            # cria modelo de EquivalenceResult compatível com app.models.EquivalenceResult
+            r = models.EquivalenceResult(
+                id=result_id,
+                request_id=request_id,
+                tenant_id=tenant_id,
+                course_id=None,
+                origem_nome=origem_nome or "",
+                origem_carga=origem_carga or 0,
+                origem_hash=sha256_text(payload.get("origem", {}).get("ementa", "")),
+                destino_nome=destino_nome or "",
+                destino_carga=destino_carga or 0,
+                destino_hash=sha256_text(payload.get("destino", {}).get("ementa", "")),
+                decision=(resp.decisao if hasattr(resp, 'decisao') else getattr(resp, 'decision', None) or ""),
+                score=(resp.score if hasattr(resp, 'score') else 0),
+                breakdown=(resp.breakdown.model_dump() if hasattr(resp, 'breakdown') and hasattr(resp.breakdown, 'model_dump') else (resp.breakdown if hasattr(resp, 'breakdown') else {})),
+                missing=(resp.faltantes if hasattr(resp, 'faltantes') else (resp.missing if hasattr(resp, 'missing') else [])),
+                missing_critical=(resp.criticos_faltantes if hasattr(resp, 'criticos_faltantes') else (resp.missing_critical if hasattr(resp, 'missing_critical') else [])),
+                justificativa_curta=(resp.justificativa_curta if hasattr(resp, 'justificativa_curta') else (resp.short_justification if hasattr(resp, 'short_justification') else "")),
+                justificativa_detalhada=(resp.justificativa_detalhada if hasattr(resp, 'justificativa_detalhada') else (resp.long_justification if hasattr(resp, 'long_justification') else "")),
+                degraded_mode=(resp.degraded_mode if hasattr(resp, 'degraded_mode') else False),
+                model_version=(resp.model_version if hasattr(resp, 'model_version') else ""),
+                policy_version=(resp.policy_version if hasattr(resp, 'policy_version') else ""),
+                taxonomy_version=(resp.taxonomy_version if hasattr(resp, 'taxonomy_version') else ""),
+                timings_ms=(resp.timings_ms.model_dump() if hasattr(resp, 'timings_ms') and hasattr(resp.timings_ms, 'model_dump') else (resp.timings_ms if hasattr(resp, 'timings_ms') else {})),
+            )
+
+            # salva no DB
+            ResultRepo().save_result(db, r)
+
+            # marca item com result_id e atualiza contadores
+            repo.mark_item(db, item_id, "done", result_id=result_id)
+            repo.update_counts(db, job_id, done_inc=1)
+
+            # se job completo, marca status
+            job_obj = db.get(models.Job, job_id)
+            if job_obj and (job_obj.done + job_obj.failed) >= (job_obj.total or 0):
+                job_obj.status = "done"
+                db.commit()
+
+        except Exception as e:
+            # em caso de erro ao salvar resultado, marca item como failed
+            repo.mark_item(db, item_id, "failed", error=str(e))
+            repo.update_counts(db, job_id, failed_inc=1)
+            return
 
     except Exception as e:
         # Se for erro de unique constraint, tenta buscar existente e marcar done

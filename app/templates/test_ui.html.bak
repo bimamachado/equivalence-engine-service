@@ -295,7 +295,6 @@
       font-size: 12px;
       background: var(--dark);
       border: 1px solid var(--dark-border);
-      color: white;
     }
     
     pre {
@@ -439,7 +438,6 @@
       <div class="response-header">
         <h3>📊 Resposta da API</h3>
         <button class="copy-btn" id="copyBtn" style="display: none;">📋 Copiar</button>
-        <button class="copy-btn" id="clearBtn" style="display: none;">🧹 Limpar</button>
       </div>
       <pre id="result"><div class="empty-state">Nenhuma resposta ainda. Envie uma requisição para ver os resultados.</div></pre>
       <div style="height:12px"></div>
@@ -578,7 +576,6 @@
     const status = document.getElementById('status');
     const result = document.getElementById('result');
     const copyBtn = document.getElementById('copyBtn');
-    const clearBtn = document.getElementById('clearBtn');
 
     // Tab switching
     tabBtnSingle.addEventListener('click', () => {
@@ -646,12 +643,10 @@
         }
         
         copyBtn.style.display = 'block';
-        if (clearBtn) clearBtn.style.display = 'block';
       } catch (err) {
         status.className = 'status error';
         status.textContent = '✕ Erro ao processar';
         result.textContent = String(err);
-        if (clearBtn) clearBtn.style.display = 'none';
       }
     });
 
@@ -685,84 +680,26 @@
         const jobId = data.job_id;
 
         const poll = async () => {
-          try {
-            const sj = await fetch(`/v1/jobs/${jobId}`, { headers: { 'X-API-Key': apiKey } });
-            if (!sj.ok) {
-              statusBatchEl.className = 'status error';
-              statusBatchEl.textContent = `✕ Erro ao buscar status (HTTP ${sj.status})`;
-              resultBatchEl.textContent = await sj.text();
-              return;
-            }
-
-            let sjd;
-            try {
-              sjd = await sj.json();
-            } catch (e) {
-              statusBatchEl.className = 'status error';
-              statusBatchEl.textContent = '✕ Erro parseando status';
-              resultBatchEl.textContent = await sj.text();
-              return;
-            }
-
-            statusBatchEl.className = 'status loading';
-            const done = (sjd.progress && typeof sjd.progress.done === 'number') ? sjd.progress.done : 0;
-            const total = (sjd.progress && typeof sjd.progress.total === 'number') ? sjd.progress.total : (sjd.total || 0);
-            statusBatchEl.textContent = `⏳ Job ${jobId} — ${sjd.status} (${done}/${total})`;
-
-            // Continue polling only while job is running/queued and not all items are done.
-            const allDone = (sjd.progress && done >= total);
-            const stillActive = (sjd.status === 'queued' || sjd.status === 'running');
-            if (stillActive && !allDone) {
-              setTimeout(poll, 1500);
-            } else {
-              const r = await fetch(`/v1/jobs/${jobId}/results`, { headers: { 'X-API-Key': apiKey } });
-              if (!r.ok) {
-                statusBatchEl.className = 'status error';
-                statusBatchEl.textContent = `✕ Erro ao buscar resultados (HTTP ${r.status})`;
-                resultBatchEl.textContent = await r.text();
-                return;
-              }
-
-              let results;
-              try {
-                results = await r.json();
-              } catch (e) {
-                statusBatchEl.className = 'status error';
-                statusBatchEl.textContent = '✕ Erro parseando resultados';
-                resultBatchEl.textContent = await r.text();
-                return;
-              }
-
-              statusBatchEl.className = 'status success';
-              statusBatchEl.textContent = `✓ Processamento concluído`;
-              resultBatchEl.textContent = JSON.stringify({job: sjd, results}, null, 2);
-
-              // Atualiza o painel principal "Resposta da API" com resumo das decisões
-              try {
-                const summarized = results.map(it => {
-                  if (it.result) {
-                    return {
-                      request_id: it.result.request_id,
-                      decision: it.result.decision,
-                      score: it.result.score,
-                      justificativa_curta: it.result.justificativa_curta,
-                      justificativa_detalhada: it.result.justificativa_detalhada,
-                      created_at: it.result.created_at,
-                    };
-                  }
-                  return { item_id: it.item_id, status: it.status, error: it.error };
-                });
-                result.textContent = JSON.stringify(summarized, null, 2);
-                copyBtn.style.display = 'block';
-              } catch (e) {
-                // não-fatal: mantém resultBatchEl como fonte de verdade
-                console.error('Erro ao preencher painel principal:', e);
-              }
-            }
-          } catch (err) {
+          const sj = await fetch(`/v1/jobs/${jobId}`, { headers: { 'X-API-Key': apiKey } });
+          if (!sj.ok) {
             statusBatchEl.className = 'status error';
-            statusBatchEl.textContent = `✕ Erro de rede`;
-            resultBatchEl.textContent = String(err);
+            statusBatchEl.textContent = `✕ Erro ao buscar status`;
+            resultBatchEl.textContent = await sj.text();
+            return;
+          }
+
+          const sjd = await sj.json();
+          statusBatchEl.className = 'status loading';
+          statusBatchEl.textContent = `⏳ Job ${jobId} — ${sjd.status} (${sjd.progress.done}/${sjd.progress.total})`;
+
+          if (sjd.status === 'queued' || (sjd.progress && sjd.progress.done < sjd.progress.total)) {
+            setTimeout(poll, 1500);
+          } else {
+            const r = await fetch(`/v1/jobs/${jobId}/results`, { headers: { 'X-API-Key': apiKey } });
+            const results = await r.json();
+            statusBatchEl.className = 'status success';
+            statusBatchEl.textContent = `✓ Processamento concluído`;
+            resultBatchEl.textContent = JSON.stringify({job: sjd, results}, null, 2);
           }
         };
 
@@ -771,7 +708,6 @@
         statusBatchEl.className = 'status error';
         statusBatchEl.textContent = '✕ Erro';
         resultBatchEl.textContent = String(err);
-        if (clearBtn) clearBtn.style.display = 'none';
       }
     });
 
@@ -784,20 +720,6 @@
         copyBtn.textContent = originalText;
       }, 2000);
     });
-
-    // Clear results (main and batch)
-    if (clearBtn) {
-      clearBtn.addEventListener('click', () => {
-        result.innerHTML = '<div class="empty-state">Nenhuma resposta ainda. Envie uma requisição para ver os resultados.</div>';
-        const resultBatchElLocal = document.getElementById('resultBatch');
-        if (resultBatchElLocal) resultBatchElLocal.innerHTML = '<div class="empty-state">Nenhuma resposta de lote ainda. Envie um lote para ver os resultados.</div>';
-        copyBtn.style.display = 'none';
-        clearBtn.style.display = 'none';
-        const statusBatchLocal = document.getElementById('statusBatch');
-        if (statusBatchLocal) statusBatchLocal.style.display = 'none';
-        status.style.display = 'none';
-      });
-    }
   </script>
 </body>
 </html>
