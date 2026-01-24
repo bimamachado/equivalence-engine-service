@@ -73,4 +73,37 @@ Debugging
 - Para investigar jobs RQ: `rq info -u redis://localhost:6379/0`.
  Para investigar jobs RQ: `rq info -u redis://127.0.0.1:6379/0`.
 
+Troubleshooting: worker e variáveis de ambiente
+-----------------------------------------------
+
+Se você ajustar variáveis em `.env` que afetem `REDIS_URL`, `DATABASE_URL`, `EMBED_URL` ou `LLM_URL`, o `worker` (container ou processo) precisa ser reiniciado para carregar as novas variáveis. Passos rápidos:
+
+- Com Docker Compose:
+
+```bash
+# rebuild/recreate apenas o worker para aplicar novas envs
+docker compose up -d --no-deps --force-recreate worker
+
+# (opcional) ver logs do worker
+docker compose logs --no-color --tail=200 worker
+```
+
+- Sem Docker (local):
+
+```bash
+source .venv/bin/activate
+export REDIS_URL=redis://localhost:6379/0
+export EMBED_URL=http://localhost:9001
+export LLM_URL=http://localhost:9002
+rq worker -u "$REDIS_URL" equivalence
+```
+
+Problemas comuns e como checar:
+
+- Itens marcados como `failed` no painel de jobs: verifique os logs do `worker` e as mensagens de erro em `/v1/jobs/<job_id>/results`.
+- `Connection refused` para `mock-embed` ou `mock-llm`: confirme se os serviços `mock-embed` e `mock-llm` estão `Up` no `docker compose ps` e se os `EMBED_URL`/`LLM_URL` apontam para `mock-embed:9001` e `mock-llm:9002` quando usando compose.
+- Tabelas ausentes (`relation "api_keys" does not exist`): execute migrações ou chame `app.bootstrap.init_db()` dentro do container para criar as tabelas de desenvolvimento.
+
+Adicionar essa breve seção evita quedas inesperadas no processamento em lote após mudanças de configuração.
+
 
