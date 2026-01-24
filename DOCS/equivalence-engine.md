@@ -251,7 +251,7 @@ Resultado final: `score 0–100`
 Transforma score + critérios em decisão:
 
 * `DEFERIDO`
-* `COMPLEMENTO`
+* `ANALISE_HUMANA`
 * `INDEFERIDO`
 * `ANALISE_HUMANA` (modo degradado)
 

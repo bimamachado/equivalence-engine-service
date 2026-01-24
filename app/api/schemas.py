@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Literal, Optional
 from pydantic import BaseModel, Field, conint, confloat
 
-DecisionType = Literal["DEFERIDO", "INDEFERIDO", "COMPLEMENTO", "ANALISE_HUMANA"]
+DecisionType = Literal["DEFERIDO", "INDEFERIDO", "ANALISE_HUMANA"]
 RuleName = Literal["aprovacao", "carga_horaria", "nivel", "validade_temporal", "input_minimo"]
 
 class DisciplineInput(BaseModel):

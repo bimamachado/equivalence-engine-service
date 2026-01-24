@@ -210,5 +210,3 @@ Próximos passos que eu posso fazer
 
 ---
 
-Arquivo criado: `README.full.md`. Se quiser que eu integre este conteúdo ao `README.md` principal, diga se prefere que eu substitua um bloco específico ou que eu adicione um link para `README.full.md` no topo do `README.md`.
-

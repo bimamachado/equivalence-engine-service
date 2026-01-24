@@ -14,6 +14,8 @@ def decide(policy: PolicyInput, score: int, cov_crit: float, degraded_mode: bool
         return "DEFERIDO", "Score e critérios atendidos para deferimento automático."
 
     if score >= policy.min_score_complemento:
-        return "COMPLEMENTO", "Similaridade suficiente, mas recomenda-se complemento para fechar lacunas."
+        # Mudar comportamento: decisões que antes eram 'COMPLEMENTO' passam a
+        # exigir revisão humana (ANALISE_HUMANA) para garantir checagem manual.
+        return "ANALISE_HUMANA", "Similaridade suficiente, recomenda-se complemento — encaminhado para análise humana."
 
     return "INDEFERIDO", "Score insuficiente para equivalência."

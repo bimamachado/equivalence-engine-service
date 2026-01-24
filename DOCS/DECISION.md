@@ -1,6 +1,6 @@
-# Algoritmo de Decisão (DEFERIR / INDEFERIR / COMPLEMENTO / ANÁLISE HUMANA)
+# Algoritmo de Decisão (DEFERIR / INDEFERIDO / ANALISE_HUMANA)
 
-Este documento descreve com detalhe o fluxo do algoritmo que decide `DEFERIDO`, `INDEFERIDO`, `COMPLEMENTO` ou `ANALISE_HUMANA`, o formato JSON de entrada/saida e em que momento a LLM/mapper é acionada.
+Este documento descreve com detalhe o fluxo do algoritmo que decide `DEFERIDO`, `INDEFERIDO` ou `ANALISE_HUMANA`, o formato JSON de entrada/saida e em que momento a LLM/mapper é acionada.
 
 Resumo rápido do fluxo (implementação em `app/engine/service.py`):
 
@@ -79,7 +79,7 @@ Exemplo de entrada (simplificado):
 Saída (EvaluateResponse) — campos principais
 
 - `request_id` (string)
-- `decisao` (one of `DEFERIDO`, `INDEFERIDO`, `COMPLEMENTO`, `ANALISE_HUMANA`)
+- `decisao` (one of `DEFERIDO`, `INDEFERIDO`, `ANALISE_HUMANA`)
 - `score` (0-100)
 - `breakdown`: `{ cobertura, cobertura_critica, penalidade_nivel }` (valores 0..1)
 - `hard_rules`: lista de resultados de verificação de regras (nome, ok, detalhes)
@@ -130,7 +130,7 @@ Detalhes do algoritmo
   1. Se `degraded_mode == True` → `ANALISE_HUMANA` (conservador).
   2. Se `policy.exigir_criticos == True` e `cov_crit < 1.0` → `INDEFERIDO`.
   3. Se `score >= policy.min_score_deferir` → `DEFERIDO`.
-  4. Se `score >= policy.min_score_complemento` → `COMPLEMENTO`.
+  4. Se `score >= policy.min_score_complemento` → `ANALISE_HUMANA`.
   5. Caso contrário → `INDEFERIDO`.
 
 - Regra de borderline por `carga_horaria` (implementada em `service.evaluate` antes de `decide`):
@@ -145,7 +145,7 @@ Quando a LLM é chamada
 
 Boas práticas operacionais
 
-- Teste com o `test-ui` e payloads de exemplo para verificar cenários `DEFERIDO`, `COMPLEMENTO`, `INDEFERIDO` e `ANALISE_HUMANA`.
+- Teste com o `test-ui` e payloads de exemplo para verificar cenários `DEFERIDO`, `INDEFERIDO` e `ANALISE_HUMANA`.
 - Ajuste `policy.min_score_deferir` e `min_score_complemento` para calibrar o trade-off entre automação e revisões humanas.
 - Monitore `degraded_mode` e alertas do mapper/LLM; configure fallback apenas se aceitar revisões humanas posteriores.
 
@@ -160,7 +160,7 @@ Referências no código
 ---
 
 Se quiser, posso também:
-- adicionar exemplos JSON completos (entrada + saída) para 4 cenários (DEFERIDO/INDEFERIDO/COMPLEMENTO/ANALISE_HUMANA),
+- adicionar exemplos JSON completos (entrada + saída) para 3 cenários (DEFERIDO/INDEFERIDO/ANALISE_HUMANA),
 - ou criar scripts em `scripts/` que rodem esses exemplos automaticamente contra a instância local.
 
 Arquivos Python principais envolvidos
@@ -351,11 +351,9 @@ Esta seção explica, em linguagem operacional, o que significa cada decisão, q
   - Para que serve: protege a integridade acadêmica evitando aprovações errôneas; sinaliza que a disciplina não atende os requisitos mínimos para equivalência.
   - Efeito operacional: a requisição é finalizada como rejeitada; o sistema deve fornecer justificativa detalhada para permitir recurso/manual review, se aplicável.
 
-- `COMPLEMENTO`
-  - O que é: decisão intermediária indicando que a equivalência é plausível, mas há lacunas significativas que exigem complementos (atividades, disciplina(s) complementares ou documentação adicional) para aprovar automaticamente.
-  - Quando ocorre: quando `score >= policy.min_score_complemento` mas `score < policy.min_score_deferir`, ou quando há faltantes não críticos que podem ser resolvidos com complementos.
-  - Para que serve: oferece uma via operacional para reduzir revisões humanas completas, propondo ações corretivas (complemento) — p.ex., cursar conteúdo complementar ou apresentar evidências adicionais.
-  - Efeito operacional: o sistema pode registrar recomendações de complementos (texto em `justificativa_detalhada`) e abrir um fluxo para registrar cumprimento do complemento e reavaliação.
+- Nota: a decisão anteriormente descrita como `COMPLEMENTO` passa a ser tratada como `ANALISE_HUMANA`.
+  - Racional: cenários que ficariam em um estado intermediário e exigiriam complementos agora são encaminhados para revisão humana, para garantir checagem manual e evitar decisões automáticas parciais.
+  - Quando aplicável: quando `score >= policy.min_score_complemento` mas `score < policy.min_score_deferir`, ou quando há faltantes que demandam intervenção humana.
 
 - `ANALISE_HUMANA`
   - O que é: indicação de que o caso deve ser revisado por um avaliador humano (coordenador de curso, comissão ou equipe técnica).
@@ -369,11 +367,8 @@ Esta seção explica, em linguagem operacional, o que significa cada decisão, q
 
 Observações adicionais
 
-- As decisões `DEFERIDO`/`INDEFERIDO` e `COMPLEMENTO` são projetadas para automação com níveis de confiança controlados por `policy`.
+- As decisões `DEFERIDO` e `INDEFERIDO` são projetadas para automação com níveis de confiança controlados por `policy`; casos de limiar intermediário são encaminhados para `ANALISE_HUMANA`.
 - `ANALISE_HUMANA` é o mecanismo de defesa para cenários incertos ou quando o pipeline de IA está degradado; para reduzir o volume de `ANALISE_HUMANA` é comum calibrar `policy.min_score_deferir` e `min_score_complemento`, melhorar o mapper e usar evidências mais ricas.
 
 
----
-
-Agora commito e faço push desta atualização na documentação.
 

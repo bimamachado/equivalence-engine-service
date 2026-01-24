@@ -30,7 +30,7 @@ def test_decide_deferido_by_score():
 def test_decide_complemento_by_score():
     p = Policy(exigir_criticos=False, min_score_deferir=90, min_score_complemento=70)
     decision, _ = decide(p, score=75, cov_crit=1.0, degraded_mode=False)
-    assert decision == "COMPLEMENTO"
+    assert decision == "ANALISE_HUMANA"
 
 
 def test_decide_indeferido_low_score():

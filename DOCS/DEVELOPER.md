@@ -73,5 +73,4 @@ Debugging
 - Para investigar jobs RQ: `rq info -u redis://localhost:6379/0`.
  Para investigar jobs RQ: `rq info -u redis://127.0.0.1:6379/0`.
 
-Contribuição
-- Abra PRs pequenos, escreva testes e descreva mudanças no corpo do PR.
+

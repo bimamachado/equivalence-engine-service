@@ -1,6 +1,6 @@
 # Workflows operacionais por decisão
 
-Este documento descreve os fluxos operacionais que acontecem após cada decisão do motor: `DEFERIDO`, `INDEFERIDO`, `COMPLEMENTO` e `ANALISE_HUMANA`.
+Este documento descreve os fluxos operacionais que acontecem após cada decisão do motor: `DEFERIDO`, `INDEFERIDO` e `ANALISE_HUMANA`.
 
 Para cada caso há: propósito, checklist de ações automáticas e manuais, e um template de justificativa que pode ser usado na UI ou em comunicações.
 
@@ -57,36 +57,36 @@ Para cada caso há: propósito, checklist de ações automáticas e manuais, e u
   Conceitos críticos faltantes: {criticos_faltantes}
   Ações possíveis: submissão de evidências / complemento / recurso.
 
-## 3) COMPLEMENTO
+## 3) ANÁLISE_HUMANA
 
-- Propósito: indicar que a equivalência pode ser obtida mediante complementos (atividades, disciplina(s) curta, entrega de evidências).
+- Propósito: encaminhar casos que antes seriam marcados como `COMPLEMENTO` para revisão humana, garantindo checagem manual antes de qualquer ação automatizada.
 
 - Checklist automático (sistema):
-  1. Persistir resultado com `decisao=COMPLEMENTO` e lista de lacunas (`faltantes`).
-  2. Gerar plano de complemento automático (se regra de negócio suportar) ou instrução textual padrão indicando o que complementar.
-  3. Notificar aluno com passos a cumprir, prazo sugerido e como pedir reavaliação ao completar.
-  4. Gerar entrada em workflow de acompanhamento (ex.: `complemento_pending`).
+  1. Persistir resultado com `decisao=ANALISE_HUMANA` e lista de lacunas (`faltantes`).
+  2. Marcar caso para triagem humana e indexar evidências para o avaliador.
+  3. Notificar avaliadores/triagem com prioridade e instruções de revisão.
+  4. Gerar entrada em workflow de acompanhamento (ex.: `analise_humana_pending`).
 
 - Ações manuais recomendadas:
-  - Se aplicável, coordenador especifica atividades, prazos e critérios de aceitação.
-  - Ao receber evidências, reavaliar automaticamente ou manualmente conforme política.
+  - Avaliador identifica atividades/prazos e, se aplicável, propõe plano de complemento.
+  - Ao receber evidências, avaliador decide entre `DEFERIDO`, `INDEFERIDO` ou solicitar complemento específico.
 
 - Template de justificativa (curta):
 
-  COMPLEMENTO: Similaridade suficiente, requer complementos para aprovação automática.
+  ANALISE_HUMANA: Caso encaminhado para revisão humana devido a lacunas ou necessidade de verificação manual.
 
 - Template de justificativa (detalhada):
 
-  Decisão: COMPLEMENTO
+  Decisão: ANALISE_HUMANA
   Motivo: {motivo_from_engine}
   Score final: {score}/100
   Lacunas identificadas (node ids): {faltantes}
-  Recomendação: {descricao_do_complemento} (ex.: cursar módulo X, entregar plano de estudos Y)
+  Recomendação: {descricao_do_complemento} (ex.: cursar módulo X, entregar plano de estudos Y) — decisão final depende da análise humana.
 
-Checklist para reavaliação após complemento:
-  - Receber comprovante/atividade/documento.
-  - Validar se conteúdo cobre os `faltantes` citados.
-  - Rodar reavaliação automática; se score agora >= `min_score_deferir` → aprovar.
+Checklist para reavaliação após intervenção humana:
+  - Receber comprovante/atividade/documento (quando aplicável).
+  - Avaliador valida se conteúdo cobre os `faltantes` citados.
+  - Decisão final: `DEFERIDO` se score >= `min_score_deferir` ou `INDEFERIDO` caso contrário; avaliador pode também requisitar complemento e agendar reavaliação.
 
 ## 4) ANÁLISE_HUMANA
 
@@ -108,17 +108,16 @@ Checklist para reavaliação após complemento:
   2. Conferir `hard_rules` e confirmar se alguma regra administrativa exige ação.
   3. Revisar `covered_concepts` e `missing_concepts` com a taxonomia; identificar se lacunas são formais ou substantivas.
   4. Considerar equivalência por conteúdo: comparar objetivos e tópicos centrais.
-  5. Decidir entre: `DEFERIDO`, `INDEFERIDO` ou `COMPLEMENTO` (pode também solicitar mais informações).
+   5. Decidir entre: `DEFERIDO`, `INDEFERIDO` ou `ANALISE_HUMANA` (pode também solicitar mais informações).
   6. Registrar justificativa detalhada e ações (aprovar, negar, exigir complemento, anexar observações administrativas).
 
 - Template de nota do avaliador (para registrar na aplicação):
 
   Avaliador: {nome_avaliador}
   Data: {YYYY-MM-DD}
-  Decisão: {DEFERIDO|INDEFERIDO|COMPLEMENTO}
+  Decisão: {DEFERIDO|INDEFERIDO|ANALISE_HUMANA}
   Racional: {texto explicando motivos, com referências a tópicos/trechos da ementa}
   Ações: {ex.: emitir equivalência / exigir complemento X / abrir recurso}
 
 ---
 
-Arquivo criado automaticamente: `DOCS/WORKFLOWS.md` — commit e push serão feitos agora.

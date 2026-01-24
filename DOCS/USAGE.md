@@ -122,4 +122,3 @@ curl -i http://127.0.0.1:8001/metrics
 - Use chaves com escopo/role adequados: não reutilize uma chave `api-client` para ações administrativas.
 - Para testes rápidos, use `app/seed.py` para criar chaves dev (veja variáveis de ambiente `ADMIN_API_KEY`, `AUDITOR_API_KEY`, `CLIENT_API_KEY`).
 
-Se quiser, eu crio também um `README` resumido ou exemplos prontos em `scripts/` (ex.: `scripts/example_batch.sh`) com `curl` prontos para uso. Deseja que eu adicione isso e commite para você, ou prefere commitar manualmente?

@@ -34,7 +34,7 @@ def tune_for_course(db: Session, tenant_id: str, course_id: str):
             if score >= t_defer:
                 yhat = "DEFERIDO"
             elif score >= t_comp:
-                yhat = "COMPLEMENTO"
+                yhat = "ANALISE_HUMANA"
             if yhat == y:
                 correct += 1
         return correct / len(data)

@@ -120,7 +120,7 @@ class Label(Base):
     id = Column(String, primary_key=True)  # uuid
     result_id = Column(String, ForeignKey("equivalence_results.id"), index=True, nullable=False)
     labeled_by = Column(String, nullable=False)
-    label = Column(String, nullable=False)  # DEFERIDO|INDEFERIDO|COMPLEMENTO
+    label = Column(String, nullable=False)  # DEFERIDO|INDEFERIDO|ANALISE_HUMANA
     notes = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 

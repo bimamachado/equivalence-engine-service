@@ -331,4 +331,3 @@ Notas rápidas:
 - Use `options.allow_degraded_fallback` quando quiser tentar um mapper alternativo (mais genérico) ao primário.
 - `policy.confidence_cutoff` controla o que é considerado "confiável" no mapeamento para cálculo de cobertura.
 
-Se quiser que eu una este conteúdo ao arquivo principal `DOCS/MACRO_TO_MICRO.md`, eu aplico o patch direto no arquivo fonte.

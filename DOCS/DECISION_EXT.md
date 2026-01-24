@@ -34,7 +34,7 @@ Este documento complementa `DOCS/DECISION.md` com definições operacionais e re
   - Ao atualizar o modelo, criar uma nova `model_version` e testar impacto em um conjunto controlado.
 
 ## `policy_version`
-- Representa a versão da política de decisão — ou seja, dos parâmetros e thresholds que determinam as faixas para `DEFERIDO`, `COMPLEMENTO`, `INDEFERIDO`, etc.
+- Representa a versão da política de decisão — ou seja, dos parâmetros e thresholds que determinam as faixas para `DEFERIDO`, `ANALISE_HUMANA`, `INDEFERIDO`, etc.
 - Exemplos de parâmetros controlados pela `policy_version`:
   - `defer_threshold` (score mínimo para deferir)
   - `complement_threshold` (intervalo que exige complemento)
@@ -65,4 +65,3 @@ Este documento complementa `DOCS/DECISION.md` com definições operacionais e re
 
 ---
 
-Se quiser, eu posso integrar esse texto diretamente em `DOCS/DECISION.md` (mesclar/formatar no local apropriado) ou deixar este arquivo de extensão como referência separada. Qual prefere?
