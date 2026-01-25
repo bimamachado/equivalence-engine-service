@@ -2,6 +2,7 @@ import json
 import os
 import subprocess
 from pathlib import Path
+import shutil
 import pytest
 
 
@@ -14,6 +15,10 @@ def test_run_integration_script_is_successful(tmp_path):
     """
     if os.getenv("RUN_INTEGRATION", "0") != "1":
         pytest.skip("Set RUN_INTEGRATION=1 to run integration tests")
+
+    # if docker is not available (e.g. running inside container), skip
+    if shutil.which("docker") is None:
+        pytest.skip("docker not available; skipping full run-integration script")
 
     repo_root = Path(__file__).resolve().parents[1]
     script = repo_root / "run-integration.sh"

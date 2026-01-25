@@ -8,7 +8,7 @@ def get_api_key_record(db: Session, api_key: str) -> models.ApiKey | None:
 
     rec = db.execute(
         select(models.ApiKey).where(models.ApiKey.key_hash == key_hash)
-    ).scalar_one_or_none()
+    ).scalars().first()
 
     if not rec:
         return None

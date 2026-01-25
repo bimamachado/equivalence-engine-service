@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Auditoria</title></head>
+<body>
+  <h2>Resultados (últimos 200)</h2>
+  <form method="get">
+    <select name="decision">
+      <option value="">Todos</option>
+      <option value="DEFERIDO">DEFERIDO</option>
+      <option value="ANALISE_HUMANA">ANALISE_HUMANA</option>
+      <option value="INDEFERIDO">INDEFERIDO</option>
+      <option value="ANALISE_HUMANA">ANALISE_HUMANA</option>
+    </select>
+    <button type="submit">Filtrar</button>
+  </form>
+
+  <table border="1" cellpadding="6" cellspacing="0">
+    <tr>
+      <th>Quando</th><th>Request</th><th>Decisão</th><th>Score</th><th>Degradado</th><th>Detalhe</th>
+    </tr>
+    
+      <tr>
+        <td>2026-01-24 23:28:20.515561+00:00</td>
+        <td>batch-3-humano</td>
+        <td>ANALISE_HUMANA</td>
+        <td>100</td>
+        <td>False</td>
+        <td><a href="/dashboard/result/eec1728a-f14e-45c8-8612-3ffb5225d3d1">abrir</a></td>
+      </tr>
+    
+      <tr>
+        <td>2026-01-24 23:28:20.043362+00:00</td>
+        <td>batch-2-indeferido</td>
+        <td>INDEFERIDO</td>
+        <td>0</td>
+        <td>False</td>
+        <td><a href="/dashboard/result/618fe7d8-c956-4bdb-90c6-58bd1e2ffadd">abrir</a></td>
+      </tr>
+    
+      <tr>
+        <td>2026-01-24 23:28:19.655972+00:00</td>
+        <td>batch-1-deferido</td>
+        <td>DEFERIDO</td>
+        <td>100</td>
+        <td>False</td>
+        <td><a href="/dashboard/result/bafab755-efe8-4ad1-b030-441648bfb6fb">abrir</a></td>
+      </tr>
+    
+      <tr>
+        <td>2026-01-24 23:27:29.298951+00:00</td>
+        <td>ui-test-1</td>
+        <td>DEFERIDO</td>
+        <td>100</td>
+        <td>False</td>
+        <td><a href="/dashboard/result/da53a663-1ba6-4686-b1fb-c4ab2549cac9">abrir</a></td>
+      </tr>
+    
+  </table>
+</body>
+</html>

@@ -135,6 +135,9 @@ class Tenant(Base):
 
 class ApiKey(Base):
     __tablename__ = "api_keys"
+    __table_args__ = (
+        UniqueConstraint('key_hash', name='uq_api_keys_key_hash'),
+    )
     id = Column(String, primary_key=True)  # uuid
     tenant_id = Column(String, ForeignKey("tenants.id"), index=True, nullable=False)
     name = Column(String, nullable=False)  # ex: "prod-api", "dashboard-admin"

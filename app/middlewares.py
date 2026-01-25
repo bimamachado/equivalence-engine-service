@@ -1,3 +1,4 @@
+import os
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse
@@ -7,6 +8,7 @@ from app.auth import get_api_key_record
 
 PUBLIC_PATHS = {
     "/health",
+    "/ready",
     "/docs",
     "/openapi.json",
     "/redoc",
@@ -36,6 +38,11 @@ class ApiKeyAuthMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         api_key = request.headers.get("X-API-Key")
+        if not api_key:
+            # allow api_key via query param in development when explicitly enabled
+            if os.getenv("ALLOW_API_KEY_QUERY", "0") == "1":
+                api_key = request.query_params.get("api_key")
+
         if not api_key:
             return JSONResponse({"detail": "Missing X-API-Key"}, status_code=401)
 
