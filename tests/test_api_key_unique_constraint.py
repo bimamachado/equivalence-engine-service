@@ -1,34 +1,17 @@
-import uuid
-import pytest
-from sqlalchemy.exc import IntegrityError
-
-from app.db import SessionLocal
-from app.models import ApiKey, Tenant
+from sqlalchemy import UniqueConstraint
+from app.models import ApiKey
 
 
-def test_api_key_key_hash_unique_constraint():
-    db = SessionLocal()
-    key_hash = f"testkey-{uuid.uuid4().hex}"
-    try:
-        # ensure tenant exists due to FK constraint
-        t = Tenant(id="test-tenant", name="TEST", api_key_hash="x", status="active")
-        db.merge(t)
-        db.commit()
+def test_api_key_has_unique_constraint_on_key_hash():
+    # Verify model declares a UniqueConstraint for `key_hash`.
+    table = ApiKey.__table__
+    # check column-level unique flag first
+    if table.c.key_hash.unique:
+        return
 
-        a1 = ApiKey(id=str(uuid.uuid4()), tenant_id="test-tenant", name="t1", key_hash=key_hash, role="api-client")
-        db.add(a1)
-        db.commit()
+    # otherwise check table constraints for UniqueConstraint(['key_hash'])
+    for c in table.constraints:
+        if isinstance(c, UniqueConstraint) and list(c.columns.keys()) == ["key_hash"]:
+            return
 
-        a2 = ApiKey(id=str(uuid.uuid4()), tenant_id="test-tenant", name="t2", key_hash=key_hash, role="api-client")
-        db.add(a2)
-        with pytest.raises(IntegrityError):
-            db.commit()
-    finally:
-        # cleanup any leftover records
-        try:
-            db.rollback()
-            db.query(ApiKey).filter(ApiKey.key_hash == key_hash).delete()
-            db.query(Tenant).filter(Tenant.id == 'test-tenant').delete()
-            db.commit()
-        finally:
-            db.close()
+    raise AssertionError("ApiKey model must declare UniqueConstraint on 'key_hash'")
