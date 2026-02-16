@@ -23,9 +23,10 @@ def upsert_key(db: Session, name: str, key_plain: str, role: str):
 def run_seed():
     db: Session = SessionLocal()
     try:
-        admin_key = os.getenv("ADMIN_API_KEY", "dev-admin-123")
-        auditor_key = os.getenv("AUDITOR_API_KEY", "dev-auditor-123")
-        client_key = os.getenv("CLIENT_API_KEY", "dev-client-123")
+        admin_key = os.getenv("ADMIN_API_KEY", "dev-admin-abc123")
+        auditor_key = os.getenv("AUDITOR_API_KEY", "dev-auditor-abc123")
+        client_key = os.getenv("CLIENT_API_KEY", "dev-client-abc123")
+        dvp_key = os.getenv("DVP_API_KEY", "dvp_live_4PvMicqMbmZ4fQ4LKr4wW3uCe0OeUTPOGO2QMkTPN77S7d1e")
 
         tenant_id = "arbe"
         course_id = "ADM-001"
@@ -43,6 +44,7 @@ def run_seed():
         upsert_key(db, "dashboard-admin", admin_key, "admin")
         upsert_key(db, "dashboard-auditor", auditor_key, "auditor")
         upsert_key(db, "prod-api-client", client_key, "api-client")
+        upsert_key(db, "dvp-live-key", dvp_key, "admin")  # Key para integração com DVP
 
         # TAXONOMY VERSION
         tv_id = str(uuid.uuid4())

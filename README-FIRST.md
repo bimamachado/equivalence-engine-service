@@ -60,7 +60,8 @@ curl -sS http://localhost:8000/health
 
 12. [DOCS/USAGE.md](DOCS/USAGE.md) → Guia de uso da API
 13. [DOCS/API_EXAMPLES.md](DOCS/API_EXAMPLES.md) → Exemplos de chamadas (curl e Python)
-14. [docs/SMOKE_TEST.md](docs/SMOKE_TEST.md) → Como validar o sistema com smoke tests
+14. [DOCS/SMOKE_TEST.md](DOCS/SMOKE_TEST.md) → Como validar o sistema com smoke tests
+15. [DOCS/INTEGRATION_DVP.md](DOCS/INTEGRATION_DVP.md) → **⭐ Integração com Document Validation Platform**
 
 ---
 
