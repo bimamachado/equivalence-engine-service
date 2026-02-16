@@ -9,15 +9,37 @@ from app.security import hash_api_key
 
 
 def upsert_key(db: Session, name: str, key_plain: str, role: str):
-    kid = str(uuid.uuid4())
-    db.add(models.ApiKey(
-        id=kid,
-        tenant_id="arbe",
-        name=name,
-        key_hash=hash_api_key(key_plain),
-        role=role,
-        status="active"
-    ))
+    """
+    Cria ou atualiza uma API key. Se já existir com o mesmo nome, atualiza o hash.
+    Isso permite regenerar keys mudando apenas a variável de ambiente.
+    """
+    existing = db.query(models.ApiKey).filter(
+        models.ApiKey.tenant_id == "arbe",
+        models.ApiKey.name == name
+    ).first()
+    
+    new_hash = hash_api_key(key_plain)
+    
+    if existing:
+        # Atualiza hash se mudou (permite rotação de keys)
+        if existing.key_hash != new_hash:
+            existing.key_hash = new_hash
+            existing.status = "active"
+            print(f"  ⟳ Key '{name}' atualizada (hash mudou)")
+        else:
+            print(f"  ✓ Key '{name}' já existe (sem mudanças)")
+    else:
+        # Cria nova key
+        kid = str(uuid.uuid4())
+        db.add(models.ApiKey(
+            id=kid,
+            tenant_id="arbe",
+            name=name,
+            key_hash=new_hash,
+            role=role,
+            status="active"
+        ))
+        print(f"  + Key '{name}' criada")
 
 
 def run_seed():

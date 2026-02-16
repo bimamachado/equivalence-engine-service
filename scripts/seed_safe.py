@@ -6,22 +6,37 @@ from app.security import hash_api_key
 
 
 def upsert_api_key(db, tenant_id, name, key_plain, role):
-    """Insert API key only if it doesn't exist (by key_hash)"""
-    key_hash = hash_api_key(key_plain)
-    existing = db.query(models.ApiKey).filter_by(key_hash=key_hash).first()
-    if not existing:
+    """
+    Cria ou atualiza uma API key. Se já existir com o mesmo nome, atualiza o hash.
+    Isso permite regenerar keys mudando apenas a variável de ambiente.
+    """
+    existing = db.query(models.ApiKey).filter(
+        models.ApiKey.tenant_id == tenant_id,
+        models.ApiKey.name == name
+    ).first()
+    
+    new_hash = hash_api_key(key_plain)
+    
+    if existing:
+        # Atualiza hash se mudou (permite rotação de keys)
+        if existing.key_hash != new_hash:
+            existing.key_hash = new_hash
+            existing.status = 'active'
+            print(f"  ⟳ API key updated: {name} (hash changed)")
+        else:
+            print(f"  ⊙ API key already exists: {name}")
+    else:
+        # Cria nova key
         kid = str(uuid.uuid4())
         db.add(models.ApiKey(
             id=kid,
             tenant_id=tenant_id,
             name=name,
-            key_hash=key_hash,
+            key_hash=new_hash,
             role=role,
             status='active'
         ))
         print(f"  ✓ Created API key: {name}")
-    else:
-        print(f"  ⊙ API key already exists: {name}")
 
 
 def upsert_taxonomy_version(db, tenant_id, version, status='active'):
@@ -123,6 +138,7 @@ def run_seed_safe():
         admin_key = os.getenv('ADMIN_API_KEY', 'dev-admin-abc123')
         auditor_key = os.getenv('AUDITOR_API_KEY', 'dev-auditor-abc123')
         client_key = os.getenv('CLIENT_API_KEY', 'dev-client-abc123')
+        dvp_key = os.getenv('DVP_API_KEY', 'dvp_live_4PvMicqMbmZ4fQ4LKr4wW3uCe0OeUTPOGO2QMkTPN77S7d1e')
 
         tenant_id = 'arbe'
         course_id = 'ADM-001'
@@ -139,6 +155,7 @@ def run_seed_safe():
         upsert_api_key(db, tenant_id, 'dashboard-admin', admin_key, 'admin')
         upsert_api_key(db, tenant_id, 'dashboard-auditor', auditor_key, 'auditor')
         upsert_api_key(db, tenant_id, 'prod-api-client', client_key, 'api-client')
+        upsert_api_key(db, tenant_id, 'dvp-live-key', dvp_key, 'admin')
         db.commit()
 
         # Taxonomy version
