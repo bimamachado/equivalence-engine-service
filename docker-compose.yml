@@ -9,6 +9,8 @@ services:
       - .env
     command: uvicorn app.asgi:app --host 0.0.0.0 --port 8000 --workers 1
     depends_on:
+      - postgres
+      - redis
       - mock-embed
       - mock-llm
     volumes:
@@ -22,6 +24,7 @@ services:
       - .env
     command: rq worker -u redis://redis:6379/0 equivalence
     depends_on:
+      - postgres
       - redis
     volumes:
       - ./:/app
@@ -39,6 +42,7 @@ services:
 
   mock-llm:
     image: hashicorp/http-echo:0.2.3
+    platform: linux/amd64
     ports:
       - "9002:9002"
     command: ["-text", '{"mock":"llm response"}']

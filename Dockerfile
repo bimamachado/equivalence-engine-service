@@ -16,9 +16,16 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# Copy and set permissions for entrypoint script
+COPY scripts/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # usuário não-root (produção minimamente decente)
 RUN useradd -m appuser
 USER appuser
+
+# Set entrypoint to initialize database before starting app
+ENTRYPOINT ["/entrypoint.sh"]
 
 EXPOSE 8000
 
