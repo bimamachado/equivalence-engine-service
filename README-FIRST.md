@@ -24,7 +24,7 @@ Este arquivo indica, **em ordem lógica**, quais documentos ler para entender, c
 5. [DOCS/WORKFLOWS.md](DOCS/WORKFLOWS.md) → Fluxo de avaliação e decisões
 6. [DOCS/DECISION.md](DOCS/DECISION.md) → Lógica de decisão (DEFERIDO, INDEFERIDO, ANALISE_HUMANA)
 7. [DOCS/ARCHITECTURE/architecture_diagram.md](DOCS/ARCHITECTURE/architecture_diagram.md) → Diagrama de arquitetura
-8. [DESIGN_PATTERNS.md](DESIGN_PATTERNS.md) → **⭐ Design patterns aplicados (Repository, DI, Strategy, etc.)**
+8. [DOCS/DESIGN_PATTERNS.md](DOCS/DESIGN_PATTERNS.md) → **⭐ Design patterns aplicados (Repository, DI, Strategy, etc.)**
 
 ---
 
@@ -90,7 +90,7 @@ curl -sS http://localhost:8000/health
 **Adicione novos recursos ao sistema.**
 
 22. [DOCS/DEVELOPER.md](DOCS/DEVELOPER.md) → Guia de desenvolvimento
-23. [DESIGN_PATTERNS.md](DESIGN_PATTERNS.md) → Padrões de design implementados
+23. [DOCS/DESIGN_PATTERNS.md](DOCS/DESIGN_PATTERNS.md) → Padrões de design implementados
 24. [docs/SCRIPTS_GUIDE.md](docs/SCRIPTS_GUIDE.md) → Explicação de cada script na pasta `scripts/`
 25. [DOCS/CONTRIBUTING.md](DOCS/CONTRIBUTING.md) → Orientações para contribuir
 
