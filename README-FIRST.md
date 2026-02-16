@@ -24,6 +24,7 @@ Este arquivo indica, **em ordem lógica**, quais documentos ler para entender, c
 5. [DOCS/WORKFLOWS.md](DOCS/WORKFLOWS.md) → Fluxo de avaliação e decisões
 6. [DOCS/DECISION.md](DOCS/DECISION.md) → Lógica de decisão (DEFERIDO, INDEFERIDO, ANALISE_HUMANA)
 7. [DOCS/ARCHITECTURE/architecture_diagram.md](DOCS/ARCHITECTURE/architecture_diagram.md) → Diagrama de arquitetura
+8. [DESIGN_PATTERNS.md](DESIGN_PATTERNS.md) → **⭐ Design patterns aplicados (Repository, DI, Strategy, etc.)**
 
 ---
 
@@ -31,9 +32,9 @@ Este arquivo indica, **em ordem lógica**, quais documentos ler para entender, c
 
 **Aprenda a RODAR o projeto localmente.**
 
-8. [docs/operations/dev_run.md](docs/operations/dev_run.md) → **⭐ LEIA PRIMEIRO** runbook completo de desenvolvimento
-9. [docker-compose.yml](docker-compose.yml) → Compose com todos os serviços
-10. [.env.example](.env.example) ou [prod.env.example](prod.env.example) → Variáveis de ambiente necessárias
+9. [docs/operations/dev_run.md](docs/operations/dev_run.md) → **⭐ LEIA PRIMEIRO** runbook completo de desenvolvimento
+10. [docker-compose.yml](docker-compose.yml) → Compose com todos os serviços
+11. [.env.example](.env.example) ou [prod.env.example](prod.env.example) → Variáveis de ambiente necessárias
 
 **Passos essenciais:**
 ```bash
@@ -57,9 +58,9 @@ curl -sS http://localhost:8000/health
 
 **Conheça os ENDPOINTS e como consumir.**
 
-11. [DOCS/USAGE.md](DOCS/USAGE.md) → Guia de uso da API
-12. [DOCS/API_EXAMPLES.md](DOCS/API_EXAMPLES.md) → Exemplos de chamadas (curl e Python)
-13. [docs/SMOKE_TEST.md](docs/SMOKE_TEST.md) → Como validar o sistema com smoke tests
+12. [DOCS/USAGE.md](DOCS/USAGE.md) → Guia de uso da API
+13. [DOCS/API_EXAMPLES.md](DOCS/API_EXAMPLES.md) → Exemplos de chamadas (curl e Python)
+14. [docs/SMOKE_TEST.md](docs/SMOKE_TEST.md) → Como validar o sistema com smoke tests
 
 ---
 
@@ -67,10 +68,10 @@ curl -sS http://localhost:8000/health
 
 **Monitore e resolva problemas.**
 
-14. [DOCS/RUNBOOK.md](DOCS/RUNBOOK.md) → Runbook operacional
-15. [docs/operations/cheatsheet.md](docs/operations/cheatsheet.md) → Comandos rápidos e URLs
-16. [docs/runbooks/operations.md](docs/runbooks/operations.md) → Procedimentos operacionais
-17. [docs/runbooks/incident_response.md](docs/runbooks/incident_response.md) → Resposta a incidentes
+15. [DOCS/RUNBOOK.md](DOCS/RUNBOOK.md) → Runbook operacional
+16. [docs/operations/cheatsheet.md](docs/operations/cheatsheet.md) → Comandos rápidos e URLs
+17. [docs/runbooks/operations.md](docs/runbooks/operations.md) → Procedimentos operacionais
+18. [docs/runbooks/incident_response.md](docs/runbooks/incident_response.md) → Resposta a incidentes
 
 ---
 
@@ -78,9 +79,9 @@ curl -sS http://localhost:8000/health
 
 **Suba em ambiente de produção.**
 
-18. [DOCS/README.deploy.md](DOCS/README.deploy.md) → Checklist e instruções de deploy
-19. [docs/deploy.md](docs/deploy.md) → Guia detalhado de deploy
-20. [DOCS/SECURITY.md](DOCS/SECURITY.md) → Segurança e gestão de segredos
+19. [DOCS/README.deploy.md](DOCS/README.deploy.md) → Checklist e instruções de deploy
+20. [docs/deploy.md](docs/deploy.md) → Guia detalhado de deploy
+21. [DOCS/SECURITY.md](DOCS/SECURITY.md) → Segurança e gestão de segredos
 
 ---
 
@@ -88,9 +89,10 @@ curl -sS http://localhost:8000/health
 
 **Adicione novos recursos ao sistema.**
 
-21. [DOCS/DEVELOPER.md](DOCS/DEVELOPER.md) → Guia de desenvolvimento
-22. [docs/SCRIPTS_GUIDE.md](docs/SCRIPTS_GUIDE.md) → Explicação de cada script na pasta `scripts/`
-23. [DOCS/CONTRIBUTING.md](DOCS/CONTRIBUTING.md) → Orientações para contribuir
+22. [DOCS/DEVELOPER.md](DOCS/DEVELOPER.md) → Guia de desenvolvimento
+23. [DESIGN_PATTERNS.md](DESIGN_PATTERNS.md) → Padrões de design implementados
+24. [docs/SCRIPTS_GUIDE.md](docs/SCRIPTS_GUIDE.md) → Explicação de cada script na pasta `scripts/`
+25. [DOCS/CONTRIBUTING.md](DOCS/CONTRIBUTING.md) → Orientações para contribuir
 
 ---
 
@@ -159,8 +161,9 @@ equivalence-engine-service/
 4. [docs/SMOKE_TEST.md](docs/SMOKE_TEST.md) - Como testar
 
 ### Para Desenvolvedores
-1. [DOCS/DEVELOPER.md](DOCS/DEVELOPER.md) - Desenvolvimento local
-2. [docs/SCRIPTS_GUIDE.md](docs/SCRIPTS_GUIDE.md) - Scripts disponíveis
+1. [DESIGN_PATTERNS.md](DESIGN_PATTERNS.md) - Padrões de design aplicados
+3. [docs/SCRIPTS_GUIDE.md](docs/SCRIPTS_GUIDE.md) - Scripts disponíveis
+4. [docs/SCRIPTS_GUIDE.md](docs/SCRIPTS_GUIDE.md) - Scripts disponíveis
 3. [DOCS/WORKFLOWS.md](DOCS/WORKFLOWS.md) - Fluxo de avaliação
 
 ### Para Operações
