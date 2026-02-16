@@ -27,7 +27,7 @@ O smoke test verifica que:
 ### 1. Health check
 
 ```bash
-curl -sS http://localhost:8000/health
+curl -sS http://localhost:8100/health
 ```
 
 Esperado: `{"status":"ok"}` ou similar (HTTP 200)
@@ -37,7 +37,7 @@ Esperado: `{"status":"ok"}` ou similar (HTTP 200)
 ### 2. Teste de avaliação (payload mínimo)
 
 ```bash
-curl -sS -X POST http://localhost:8000/v1/equivalences/evaluate \
+curl -sS -X POST http://localhost:8100/v1/equivalences/evaluate \
   -H 'Content-Type: application/json' \
   -H 'X-API-Key: dev-admin-abc123' \
   -d '{
@@ -78,7 +78,7 @@ Verifique o conteúdo do script para ver o payload e validações utilizadas.
 
 ### 4. Test UI (navegador)
 
-Acesse http://localhost:8000/test para testar manualmente com exemplos pré-definidos de DEFERIDO, INDEFERIDO e ANALISE_HUMANA.
+Acesse http://localhost:8100/test para testar manualmente com exemplos pré-definidos de DEFERIDO, INDEFERIDO e ANALISE_HUMANA.
 
 ---
 

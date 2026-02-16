@@ -49,10 +49,10 @@ LLM_URL=http://mock-llm:9002
 Para **rodar no host** (modo híbrido), use `localhost`:
 
 ```bash
-DATABASE_URL=postgresql+psycopg2://equivalence:equivalence@localhost:5432/equivalence
-REDIS_URL=redis://localhost:6379/0
-EMBED_URL=http://localhost:9001
-LLM_URL=http://localhost:9002
+DATABASE_URL=postgresql+psycopg2://equivalence:equivalence@localhost:5433/equivalence
+REDIS_URL=redis://localhost:6380/0
+EMBED_URL=http://localhost:9101
+LLM_URL=http://localhost:9102
 ```
 
 ---
@@ -81,8 +81,8 @@ docker compose exec web python -m app.seed
 ### 3.4 Validar
 
 ```bash
-curl -sS http://localhost:8000/health
-curl -sS http://localhost:8000/docs
+curl -sS http://localhost:8100/health
+curl -sS http://localhost:8100/docs
 ```
 
 ---
@@ -106,7 +106,7 @@ pip install -r requirements.txt
 ### 4.3 Migrations (host = localhost)
 
 ```bash
-export DATABASE_URL=postgresql+psycopg2://equivalence:equivalence@localhost:5432/equivalence
+export DATABASE_URL=postgresql+psycopg2://equivalence:equivalence@localhost:5433/equivalence
 alembic upgrade head
 ```
 
@@ -119,7 +119,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
 ### 4.5 Iniciar worker (outro terminal)
 
 ```bash
-rq worker -u redis://localhost:6379/0 equivalence
+rq worker -u redis://localhost:6380/0 equivalence
 ```
 
 ---

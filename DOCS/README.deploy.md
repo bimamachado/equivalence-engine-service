@@ -95,8 +95,8 @@ docker-compose -f docker-compose.prod.yml exec web bash -lc "alembic upgrade hea
 
 Exemplo:
 ```bash
-curl -I http://localhost:8000/health
-curl -s http://localhost:8000/ready
+curl -I http://localhost:8100/health
+curl -s http://localhost:8100/ready
 ```
 
 8) Observabilidade

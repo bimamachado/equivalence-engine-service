@@ -37,8 +37,8 @@ Exemplo `.env` (desenvolvimento)
 POSTGRES_USER=equivalence
 POSTGRES_PASSWORD=dev-equivalence-pass
 POSTGRES_DB=equivalence
-DATABASE_URL=postgresql+psycopg2://equivalence:dev-equivalence-pass@127.0.0.1:5432/equivalence
-REDIS_URL=redis://127.0.0.1:6379/0
+DATABASE_URL=postgresql+psycopg2://equivalence:dev-equivalence-pass@127.0.0.1:5433/equivalence
+REDIS_URL=redis://127.0.0.1:6380/0
 RQ_QUEUE_NAME=equivalence
 
 API_KEY_SALT=change-this-to-a-long-random-string
@@ -81,7 +81,7 @@ Rodando o worker (dev)
 
 ```bash
 pip install -r requirements.txt
-rq worker -u redis://localhost:6379/0 equivalence
+rq worker -u redis://localhost:6380/0 equivalence
 ```
 
 - Em Docker (exemplo de serviço no compose prod): veja `docker-compose.prod.yml` que executa `rq worker -u ${REDIS_URL} ${RQ_QUEUE_NAME}`.
@@ -118,7 +118,7 @@ Exemplo em Python (requests):
 
 ```python
 import requests
-url='http://localhost:8000/v1/equivalences/evaluate'
+url='http://localhost:8100/v1/equivalences/evaluate'
 headers={'X-API-Key':'dev-admin-123','Content-Type':'application/json'}
 payload={
   'request_id':'req-001',

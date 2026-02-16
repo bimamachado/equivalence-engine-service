@@ -203,12 +203,12 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - '5432:5432'
+      - '5433:5432'
 
   redis:
     image: redis:7
     ports:
-      - '6379:6379'
+      - '6380:6379'
 
   web:
     build: .
@@ -219,7 +219,7 @@ services:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/equivalence
       REDIS_URL: redis://redis:6379/0
     ports:
-      - '8000:8000'
+      - '8100:8000'
     depends_on:
       - db
       - redis

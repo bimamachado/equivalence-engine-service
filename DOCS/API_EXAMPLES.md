@@ -24,7 +24,7 @@ curl -sS -X POST http://127.0.0.1:8001/v1/equivalences/evaluate \
 Python (requests):
 ```python
 import requests
-url='http://localhost:8000/v1/equivalences/evaluate'
+url='http://localhost:8100/v1/equivalences/evaluate'
 headers={'X-API-Key':'dev-admin-123','Content-Type':'application/json'}
 payload={...}
 resp=requests.post(url,json=payload,headers=headers)
